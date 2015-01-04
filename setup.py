@@ -11,7 +11,7 @@ from distutils.errors import CCompilerError, DistutilsExecError, \
     DistutilsPlatformError
 
 IS_PYPY = hasattr(sys, 'pypy_translation_info')
-VERSION = '3.6.5'
+VERSION = '1.0.0'
 DESCRIPTION = "Simple, fast, extensible JSON encoder/decoder for Python"
 
 with open('README.rst', 'r') as f:
@@ -79,48 +79,24 @@ class TestCommand(Command):
             subprocess.call([sys.executable,
                              # Turn on deprecation warnings
                              '-Wd',
-                             'simplejson/tests/__init__.py']))
+                             'hjson/tests/__init__.py']))
 
-def run_setup(with_binary):
+def run_setup():
     cmdclass = dict(test=TestCommand)
-    if with_binary:
-        kw = dict(
-            ext_modules = [
-                Extension("simplejson._speedups", ["simplejson/_speedups.c"]),
-            ],
-            cmdclass=dict(cmdclass, build_ext=ve_build_ext),
-        )
-    else:
-        kw = dict(cmdclass=cmdclass)
+    kw = dict(cmdclass=cmdclass)
 
     setup(
-        name="simplejson",
+        name="hjson",
         version=VERSION,
         description=DESCRIPTION,
         long_description=LONG_DESCRIPTION,
         classifiers=CLASSIFIERS,
-        author="Bob Ippolito",
-        author_email="bob@redivi.com",
-        url="http://github.com/simplejson/simplejson",
+        author="Christian Zangl",
+        author_email="coralllama@gmail.com",
+        url="http://github.com/laktak/hjson-py",
         license="MIT License",
-        packages=['simplejson', 'simplejson.tests'],
+        packages=['hjson', 'hjson.tests'],
         platforms=['any'],
         **kw)
 
-try:
-    run_setup(not IS_PYPY)
-except BuildFailed:
-    BUILD_EXT_WARNING = ("WARNING: The C extension could not be compiled, "
-                         "speedups are not enabled.")
-    print('*' * 75)
-    print(BUILD_EXT_WARNING)
-    print("Failure information, if any, is above.")
-    print("I'm retrying the build without the C extension now.")
-    print('*' * 75)
-
-    run_setup(False)
-
-    print('*' * 75)
-    print(BUILD_EXT_WARNING)
-    print("Plain-Python installation succeeded.")
-    print('*' * 75)
+run_setup()

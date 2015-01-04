@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# simplejson documentation build configuration file, created by
+# hjson documentation build configuration file, created by
 # sphinx-quickstart on Fri Sep 26 18:58:30 2008.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -35,16 +35,16 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General substitutions.
-project = 'simplejson'
-copyright = '2014, Bob Ippolito'
+project = 'hjson'
+copyright = '2014, Bob Ippolito, Christian Zangl'
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '3.6'
+version = '1.0'
 # The full version, including alpha/beta/rc tags.
-release = '3.6.5'
+release = '1.0.0'
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -142,7 +142,7 @@ html_use_modindex = False
 html_file_suffix = '.html'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'simplejsondoc'
+htmlhelp_basename = 'hjsondoc'
 
 
 # Options for LaTeX output
@@ -157,7 +157,7 @@ htmlhelp_basename = 'simplejsondoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
 latex_documents = [
-  ('index', 'simplejson.tex', 'simplejson Documentation',
+  ('index', 'hjson.tex', 'hjson Documentation',
    'Bob Ippolito', 'manual'),
 ]
 

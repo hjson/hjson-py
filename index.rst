@@ -1,7 +1,7 @@
-:mod:`simplejson` --- JSON encoder and decoder
+:mod:`hjson` --- JSON encoder and decoder
 ==============================================
 
-.. module:: simplejson
+.. module:: hjson
    :synopsis: Encode and decode the JSON format.
 .. moduleauthor:: Bob Ippolito <bob@redivi.com>
 .. sectionauthor:: Bob Ippolito <bob@redivi.com>
@@ -13,19 +13,19 @@ is a lightweight data interchange format inspired by
 `JavaScript <http://en.wikipedia.org/wiki/JavaScript>`_ object literal syntax
 (although it is not a strict subset of JavaScript [#rfc-errata]_ ).
 
-:mod:`simplejson` exposes an API familiar to users of the standard library
+:mod:`hjson` exposes an API familiar to users of the standard library
 :mod:`marshal` and :mod:`pickle` modules. It is the externally maintained
 version of the :mod:`json` library contained in Python 2.6, but maintains
 compatibility with Python 2.5 and (currently) has
 significant performance advantages, even without using the optional C
-extension for speedups. :mod:`simplejson` is also supported on Python 3.3+.
+extension for speedups. :mod:`hjson` is also supported on Python 3.3+.
 
-Development of simplejson happens on Github:
-http://github.com/simplejson/simplejson
+Development of hjson happens on Github:
+http://github.com/laktak/hjson-py
 
 Encoding basic Python object hierarchies::
 
-    >>> import simplejson as json
+    >>> import hjson as json
     >>> json.dumps(['foo', {'bar': ('baz', None, 1.0, 2)}])
     '["foo", {"bar": ["baz", null, 1.0, 2]}]'
     >>> print(json.dumps("\"foo\bar"))
@@ -36,7 +36,7 @@ Encoding basic Python object hierarchies::
     "\\"
     >>> print(json.dumps({"c": 0, "b": 0, "a": 0}, sort_keys=True))
     {"a": 0, "b": 0, "c": 0}
-    >>> from simplejson.compat import StringIO
+    >>> from hjson.compat import StringIO
     >>> io = StringIO()
     >>> json.dump(['streaming API'], io)
     >>> io.getvalue()
@@ -44,14 +44,14 @@ Encoding basic Python object hierarchies::
 
 Compact encoding::
 
-    >>> import simplejson as json
+    >>> import hjson as json
     >>> obj = [1,2,3,{'4': 5, '6': 7}]
     >>> json.dumps(obj, separators=(',', ':'), sort_keys=True)
     '[1,2,3,{"4":5,"6":7}]'
 
 Pretty printing::
 
-    >>> import simplejson as json
+    >>> import hjson as json
     >>> print(json.dumps({'4': 5, '6': 7}, sort_keys=True, indent=4 * ' '))
     {
         "4": 5,
@@ -60,20 +60,20 @@ Pretty printing::
 
 Decoding JSON::
 
-    >>> import simplejson as json
+    >>> import hjson as json
     >>> obj = [u'foo', {u'bar': [u'baz', None, 1.0, 2]}]
     >>> json.loads('["foo", {"bar":["baz", null, 1.0, 2]}]') == obj
     True
     >>> json.loads('"\\"foo\\bar"') == u'"foo\x08ar'
     True
-    >>> from simplejson.compat import StringIO
+    >>> from hjson.compat import StringIO
     >>> io = StringIO('["streaming API"]')
     >>> json.load(io)[0] == 'streaming API'
     True
 
 Using Decimal instead of float::
 
-    >>> import simplejson as json
+    >>> import hjson as json
     >>> from decimal import Decimal
     >>> json.loads('1.1', use_decimal=True) == Decimal('1.1')
     True
@@ -82,7 +82,7 @@ Using Decimal instead of float::
 
 Specializing JSON object decoding::
 
-    >>> import simplejson as json
+    >>> import hjson as json
     >>> def as_complex(dct):
     ...     if '__complex__' in dct:
     ...         return complex(dct['real'], dct['imag'])
@@ -97,7 +97,7 @@ Specializing JSON object decoding::
 
 Specializing JSON object encoding::
 
-    >>> import simplejson as json
+    >>> import hjson as json
     >>> def encode_complex(obj):
     ...     if isinstance(obj, complex):
     ...         return [obj.real, obj.imag]
@@ -113,13 +113,13 @@ Specializing JSON object encoding::
 
 .. highlight:: bash
 
-Using :mod:`simplejson.tool` from the shell to validate and pretty-print::
+Using :mod:`hjson.tool` from the shell to validate and pretty-print::
 
-    $ echo '{"json":"obj"}' | python -m simplejson.tool
+    $ echo '{"json":"obj"}' | python -m hjson.tool
     {
         "json": "obj"
     }
-    $ echo '{ 1.2:3.4}' | python -m simplejson.tool
+    $ echo '{ 1.2:3.4}' | python -m hjson.tool
     Expecting property name enclosed in double quotes: line 1 column 3 (char 2)
 
 .. highlight:: python
@@ -152,7 +152,7 @@ Basic Usage
    :class:`float`, :class:`bool`, ``None``) will be skipped instead of raising a
    :exc:`TypeError`.
 
-   The :mod:`simplejson` module will produce :class:`str` objects in Python 3,
+   The :mod:`hjson` module will produce :class:`str` objects in Python 3,
    not :class:`bytes` objects. Therefore, ``fp.write()`` must support
    :class:`str` input.
 
@@ -178,7 +178,7 @@ Basic Usage
    will be pretty-printed with a newline followed by that string repeated
    for each level of nesting. ``None`` (the default) selects the most compact
    representation without any newlines. For backwards compatibility with
-   versions of simplejson earlier than 2.1.0, an integer is also accepted
+   versions of hjson earlier than 2.1.0, an integer is also accepted
    and is converted to a string with that many spaces.
 
    .. versionchanged:: 2.1.0
@@ -623,7 +623,7 @@ Encoders and decoders
    will be pretty-printed with a newline followed by that string repeated
    for each level of nesting. ``None`` (the default) selects the most compact
    representation without any newlines. For backwards compatibility with
-   versions of simplejson earlier than 2.1.0, an integer is also accepted
+   versions of hjson earlier than 2.1.0, an integer is also accepted
    and is converted to a string with that many spaces.
 
    .. versionchanged:: 2.1.0
@@ -716,7 +716,7 @@ Encoders and decoders
       Return a JSON string representation of a Python data structure, *o*.  For
       example::
 
-        >>> import simplejson as json
+        >>> import hjson as json
         >>> json.JSONEncoder().encode({"foo": ["bar", "baz"]})
         '{"foo": ["bar", "baz"]}'
 
@@ -830,9 +830,6 @@ The RFC permits, but does not require, JSON deserializers to ignore an initial
 BOM in their input.  This module's deserializer will ignore an initial BOM, if
 present.
 
-.. versionchanged:: 3.6.0
-  Older versions would raise :exc:`ValueError` when an initial BOM is present
-
 The RFC does not explicitly forbid JSON strings which contain byte sequences
 that don't correspond to valid Unicode characters (e.g. unpaired UTF-16
 surrogates), but it does note that they may cause interoperability problems.
@@ -919,17 +916,17 @@ when serializing instances of "exotic" numerical types such as
 Command Line Interface
 ----------------------
 
-The :mod:`simplejson.tool` module provides a simple command line interface to
+The :mod:`hjson.tool` module provides a simple command line interface to
 validate and pretty-print JSON.
 
 If the optional :option:`infile` and :option:`outfile` arguments are not
 specified, :attr:`sys.stdin` and :attr:`sys.stdout` will be used respectively::
 
-    $ echo '{"json": "obj"}' | python -m simplejson.tool
+    $ echo '{"json": "obj"}' | python -m hjson.tool
     {
         "json": "obj"
     }
-    $ echo '{1.2:3.4}' | python -m simplejson.tool
+    $ echo '{1.2:3.4}' | python -m hjson.tool
     Expecting property name enclosed in double quotes: line 1 column 2 (char 1)
 
 
@@ -940,7 +937,7 @@ Command line options
 
    The JSON file to be validated or pretty-printed::
 
-      $ python -m simplejson.tool mp_films.json
+      $ python -m hjson.tool mp_films.json
       [
           {
               "title": "And Now for Something Completely Different",

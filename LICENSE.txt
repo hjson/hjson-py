@@ -1,4 +1,4 @@
-simplejson is dual-licensed software. It is available under the terms
+hjson (based on simplejson) is dual-licensed software. It is available under the terms
 of the MIT license, or the Academic Free License version 2.1. The full
 text of each license agreement is included below. This code is also
 licensed to the Python Software Foundation (PSF) under a Contributor
@@ -8,6 +8,7 @@ MIT License
 ===========
 
 Copyright (c) 2006 Bob Ippolito
+Copyright (c) 2015 Christian Zangl
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -31,6 +32,7 @@ Academic Free License v. 2.1
 ============================
 
 Copyright (c) 2006 Bob Ippolito.  All rights reserved.
+Copyright (c) 2015 Christian Zangl
 
 This Academic Free License (the "License") applies to any original work of authorship (the "Original Work") whose owner (the "Licensor") has placed the following notice immediately following the copyright notice for the Original Work:
 
