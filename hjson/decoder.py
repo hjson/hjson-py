@@ -30,6 +30,8 @@ _CONSTANTS = {
     'NaN': NaN,
 }
 
+WHITESPACE = ' \t\n\r'
+
 STRINGCHUNK = re.compile(r'(.*?)(["\\\x00-\x1f])', FLAGS)
 BACKSLASH = {
     '"': u('"'), '\\': u('\u005c'), '/': u('/'),
@@ -38,7 +40,52 @@ BACKSLASH = {
 
 DEFAULT_ENCODING = "utf-8"
 
-def py_scanstring(s, end, encoding=None, strict=True,
+def getNext(s, end, _ws=WHITESPACE):
+    while 1:
+        # Use a slice to prevent IndexError from being raised
+        ch = s[end:end + 1]
+        # Skip whitespace.
+        while ch in _ws:
+            if ch == '': return ch, end
+            end += 1
+            ch = s[end:end + 1]
+
+        # Hjson allows comments
+        ch2 = s[end + 1:end + 2]
+        if ch == "#" or ch == "/" and ch2 == "/":
+            end = getEol(s, end)
+        elif ch == "/" and ch2 == "*":
+            end += 2
+            ch = s[end]
+            while ch != '' and not (ch == '*' and s[end + 1] == "/"):
+                end += 1
+                ch = s[end]
+            if ch != '':
+                end += 2
+        else:
+            break
+
+    return ch, end
+
+def getEol(s, end):
+    # skip until eol
+
+    while 1:
+        ch = s[end:end + 1]
+        if ch == '\r' or ch == '\n' or ch == '':
+            return end
+        end += 1
+
+def skipIndent(s, end, n, _ws=WHITESPACE):
+    ch = s[end:end + 1]
+    while ch != '' and ch in " \t\r" and (n > 0 or n < 0):
+        end += 1
+        n -= 1
+        ch = s[end:end + 1]
+    return end
+
+
+def scanstring(s, end, encoding=None, strict=True,
         _b=BACKSLASH, _m=STRINGCHUNK.match, _join=u('').join,
         _PY3=PY3, _maxunicode=sys.maxunicode):
     """Scan the string s for a JSON string. End is the index of the
@@ -124,97 +171,127 @@ def py_scanstring(s, end, encoding=None, strict=True,
         _append(char)
     return _join(chunks), end
 
+def mlscanstring(s, end):
+    """Scan a multiline string"""
 
-scanstring = py_scanstring
+    # ch, begin = getNext(s, end)
+    # end = getEol(s, begin)
+    #return s[begin:end], end
 
-WHITESPACE = re.compile(r'[ \t\n\r]*', FLAGS)
-WHITESPACE_STR = ' \t\n\r'
+    string = ""
+    triple = 0
+
+    # we are at ''' - get indent
+    indent = 0
+    while 1:
+        ch = s[end-indent-1]
+        if ch == '\n': break
+        indent += 1
+
+    # skip white/to (newline)
+    end = skipIndent(s, end + 3, -1)
+
+    ch = s[end]
+    if ch == '\n': end = skipIndent(s, end + 1, indent)
+
+    # When parsing multiline string values, we must look for ' characters
+    while 1:
+        ch = s[end]
+        if ch == '':
+            raise JSONDecodeError("Bad multiline string", s, end);
+        elif ch == '\'':
+            triple += 1
+            end += 1
+            if triple == 3:
+                return string, end
+            else:
+                continue
+        else:
+            while triple > 0:
+                string += '\''
+                triple -= 1
+
+        if ch == '\n':
+            string += ch
+            end = skipIndent(s, end + 1, indent)
+        else:
+            string += ch
+            end += 1
+
+def uqscanstring(s, end):
+    """Scan the string s until eol. see scanstring"""
+
+    ch, begin = getNext(s, end)
+    end = getEol(s, begin)
+    #ch, end2 = getNext(s, end)
+
+    return s[begin:end], end
+
+def scankey(s, end, encoding=None, strict=True):
+    """Scan the string s for a JSON/Hjson key. see scanstring"""
+
+    ch, end = getNext(s, end)
+
+    if ch == '"':
+        return scanstring(s, end + 1, encoding, strict)
+
+    begin = end
+    while 1:
+        ch = s[end:end + 1]
+
+        if ch == ':':
+            return s[begin:end], end
+        elif ch >= 'a' and ch <= 'z' or ch >= 'A' and ch <= 'Z' or ch >= '0' and ch <= '9':
+            end += 1
+        else:
+            raise JSONDecodeError(
+                "Invalid keyname starting at", s, begin)
+
 
 def JSONObject(state, encoding, strict, scan_once, object_hook,
-        object_pairs_hook, memo=None,
-        _w=WHITESPACE.match, _ws=WHITESPACE_STR):
+        object_pairs_hook, memo=None):
     (s, end) = state
     # Backwards compatibility
     if memo is None:
         memo = {}
     memo_get = memo.setdefault
     pairs = []
-    # Use a slice to prevent IndexError from being raised, the following
-    # check will raise a more specific ValueError if the string is empty
-    nextchar = s[end:end + 1]
-    # Normally we expect nextchar == '"'
-    if nextchar != '"':
-        if nextchar in _ws:
-            end = _w(s, end).end()
-            nextchar = s[end:end + 1]
-        # Trivial empty object
-        if nextchar == '}':
-            if object_pairs_hook is not None:
-                result = object_pairs_hook(pairs)
-                return result, end + 1
-            pairs = {}
-            if object_hook is not None:
-                pairs = object_hook(pairs)
-            return pairs, end + 1
-        elif nextchar != '"':
-            raise JSONDecodeError(
-                "Expecting property name enclosed in double quotes",
-                s, end)
-    end += 1
+
+    ch, end = getNext(s, end)
+
+    # Trivial empty object
+    if ch == '}':
+        if object_pairs_hook is not None:
+            result = object_pairs_hook(pairs)
+            return result, end + 1
+        pairs = {}
+        if object_hook is not None:
+            pairs = object_hook(pairs)
+        return pairs, end + 1
+
     while True:
-        key, end = scanstring(s, end, encoding, strict)
+        key, end = scankey(s, end, encoding, strict)
         key = memo_get(key, key)
 
-        # To skip some function call overhead we optimize the fast paths where
-        # the JSON key separator is ": " or just ":".
-        if s[end:end + 1] != ':':
-            end = _w(s, end).end()
-            if s[end:end + 1] != ':':
-                raise JSONDecodeError("Expecting ':' delimiter", s, end)
+        ch, end = getNext(s, end)
+        if ch != ':':
+            raise JSONDecodeError("Expecting ':' delimiter", s, end)
 
-        end += 1
-
-        try:
-            if s[end] in _ws:
-                end += 1
-                if s[end] in _ws:
-                    end = _w(s, end + 1).end()
-        except IndexError:
-            pass
+        ch, end = getNext(s, end + 1)
 
         value, end = scan_once(s, end)
         pairs.append((key, value))
 
-        try:
-            nextchar = s[end]
-            if nextchar in _ws:
-                end = _w(s, end + 1).end()
-                nextchar = s[end]
-        except IndexError:
-            nextchar = ''
-        end += 1
+        ch, end = getNext(s, end)
 
-        if nextchar == '}':
+        if ch == ',':
+            ch, end = getNext(s, end + 1)
+
+        if ch == '}':
+            end += 1
             break
-        elif nextchar != ',':
-            raise JSONDecodeError("Expecting ',' delimiter or '}'", s, end - 1)
 
-        try:
-            nextchar = s[end]
-            if nextchar in _ws:
-                end += 1
-                nextchar = s[end]
-                if nextchar in _ws:
-                    end = _w(s, end + 1).end()
-                    nextchar = s[end]
-        except IndexError:
-            nextchar = ''
-
-        end += 1
-        if nextchar != '"':
-            raise JSONDecodeError(
-                "Expecting property name enclosed in double quotes",
-                s, end - 1)
+        ch, end = getNext(s, end)
 
     if object_pairs_hook is not None:
         result = object_pairs_hook(pairs)
@@ -224,44 +301,36 @@ def JSONObject(state, encoding, strict, scan_once, object_hook,
         pairs = object_hook(pairs)
     return pairs, end
 
-def JSONArray(state, scan_once, _w=WHITESPACE.match, _ws=WHITESPACE_STR):
+def JSONArray(state, scan_once):
     (s, end) = state
     values = []
-    nextchar = s[end:end + 1]
-    if nextchar in _ws:
-        end = _w(s, end + 1).end()
-        nextchar = s[end:end + 1]
+
+    ch, end = getNext(s, end)
+
     # Look-ahead for trivial empty array
-    if nextchar == ']':
+    if ch == ']':
         return values, end + 1
-    elif nextchar == '':
+    elif ch == '':
         raise JSONDecodeError("Expecting value or ']'", s, end)
     _append = values.append
     while True:
         value, end = scan_once(s, end)
         _append(value)
-        nextchar = s[end:end + 1]
-        if nextchar in _ws:
-            end = _w(s, end + 1).end()
-            nextchar = s[end:end + 1]
-        end += 1
-        if nextchar == ']':
-            break
-        elif nextchar != ',':
-            raise JSONDecodeError("Expecting ',' delimiter or ']'", s, end - 1)
 
-        try:
-            if s[end] in _ws:
-                end += 1
-                if s[end] in _ws:
-                    end = _w(s, end + 1).end()
-        except IndexError:
-            pass
+        ch, end = getNext(s, end)
+        if ch == ',':
+            ch, end = getNext(s, end + 1)
+
+        if ch == ']':
+            end += 1
+            break
+
+        ch, end = getNext(s, end)
 
     return values, end
 
 class JSONDecoder(object):
-    """Simple JSON <http://json.org> decoder
+    """Hjson <http://laktak.github.io/hjson> decoder
 
     Performs the following translations in decoding by default:
 
@@ -348,10 +417,12 @@ class JSONDecoder(object):
         self.parse_object = JSONObject
         self.parse_array = JSONArray
         self.parse_string = scanstring
+        self.parse_uqstring = uqscanstring
+        self.parse_mlstring = mlscanstring
         self.memo = {}
         self.scan_once = make_scanner(self)
 
-    def decode(self, s, _w=WHITESPACE.match, _PY3=PY3):
+    def decode(self, s, _PY3=PY3):
         """Return the Python representation of ``s`` (a ``str`` or ``unicode``
         instance containing a JSON document)
 
@@ -359,12 +430,12 @@ class JSONDecoder(object):
         if _PY3 and isinstance(s, binary_type):
             s = s.decode(self.encoding)
         obj, end = self.raw_decode(s)
-        end = _w(s, end).end()
+        ch, end = getNext(s, end)
         if end != len(s):
             raise JSONDecodeError("Extra data", s, end, len(s))
         return obj
 
-    def raw_decode(self, s, idx=0, _w=WHITESPACE.match, _PY3=PY3):
+    def raw_decode(self, s, idx=0, _PY3=PY3):
         """Decode a JSON document from ``s`` (a ``str`` or ``unicode``
         beginning with a JSON document) and return a 2-tuple of the Python
         representation and the index in ``s`` where the document ended.
@@ -388,4 +459,6 @@ class JSONDecoder(object):
                 idx += 1
             elif ord0 == 0xef and s[idx:idx + 3] == '\xef\xbb\xbf':
                 idx += 3
-        return self.scan_once(s, idx=_w(s, idx).end())
+
+        ch, idx = getNext(s, idx)
+        return self.scan_once(s, idx)

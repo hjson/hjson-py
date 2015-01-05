@@ -6,13 +6,13 @@ import hjson as json
 # 2007-10-05
 JSONDOCS = [
     # http://json.org/JSON_checker/test/fail1.json
-    '"A JSON payload should be an object or array, not a string."',
+    # '"A JSON payload should be an object or array, not a string."',
     # http://json.org/JSON_checker/test/fail2.json
     '["Unclosed array"',
     # http://json.org/JSON_checker/test/fail3.json
     '{unquoted_key: "keys must be quoted"}',
     # http://json.org/JSON_checker/test/fail4.json
-    '["extra comma",]',
+    # '["extra comma",]',
     # http://json.org/JSON_checker/test/fail5.json
     '["double extra comma",,]',
     # http://json.org/JSON_checker/test/fail6.json
@@ -22,7 +22,7 @@ JSONDOCS = [
     # http://json.org/JSON_checker/test/fail8.json
     '["Extra close"]]',
     # http://json.org/JSON_checker/test/fail9.json
-    '{"Extra comma": true,}',
+    # '{"Extra comma": true,}',
     # http://json.org/JSON_checker/test/fail10.json
     '{"Extra value after close": true} "misplaced quoted value"',
     # http://json.org/JSON_checker/test/fail11.json
@@ -40,7 +40,7 @@ JSONDOCS = [
     # http://json.org/JSON_checker/test/fail17.json
     '["Illegal backslash escape: \\017"]',
     # http://json.org/JSON_checker/test/fail18.json
-    '[[[[[[[[[[[[[[[[[[[["Too deep"]]]]]]]]]]]]]]]]]]]]',
+    # '[[[[[[[[[[[[[[[[[[[["Too deep"]]]]]]]]]]]]]]]]]]]]',
     # http://json.org/JSON_checker/test/fail19.json
     '{"Missing colon" null}',
     # http://json.org/JSON_checker/test/fail20.json
@@ -78,40 +78,32 @@ JSONDOCS = [
     '{]',
     '{"foo": "bar"]',
     '{"foo": "bar"',
-    'nul',
-    'nulx',
+    # 'nul',
+    # 'nulx',
     '-',
     '-x',
     '-e',
     '-e0',
     '-Infinite',
     '-Inf',
-    'Infinit',
-    'Infinite',
-    'NaM',
-    'NuN',
-    'falsy',
-    'fal',
-    'trug',
-    'tru',
+    # 'Infinit',
+    # 'Infinite',
+    # 'NaM',
+    # 'NuN',
+    # 'falsy',
+    # 'fal',
+    # 'trug',
+    # 'tru',
     '1e',
     '1ex',
     '1e-',
     '1e-x',
 ]
 
-SKIPS = {
-    1: "why not have a string payload?",
-    18: "spec doesn't specify any nesting limitations",
-}
-
 class TestFail(TestCase):
     def test_failures(self):
         for idx, doc in enumerate(JSONDOCS):
             idx = idx + 1
-            if idx in SKIPS:
-                json.loads(doc)
-                continue
             try:
                 json.loads(doc)
             except json.JSONDecodeError:
@@ -125,10 +117,7 @@ class TestFail(TestCase):
             try:
                 json.loads(doc)
             except json.JSONDecodeError:
-                e = sys.exc_info()[1]
-                self.assertEqual(e.pos, 1)
-                self.assertEqual(e.lineno, 1)
-                self.assertEqual(e.colno, 2)
+                pass
             except Exception:
                 e = sys.exc_info()[1]
                 self.fail("Unexpected exception raised %r %s" % (e, e))
@@ -139,23 +128,22 @@ class TestFail(TestCase):
         test_cases = [
             ('', 'Expecting value', 0),
             ('[', "Expecting value or ']'", 1),
-            ('[42', "Expecting ',' delimiter", 3),
+            # ('[42', "Expecting ',' delimiter", 3),
             ('[42,', 'Expecting value', 4),
             ('["', 'Unterminated string starting at', 1),
             ('["spam', 'Unterminated string starting at', 1),
-            ('["spam"', "Expecting ',' delimiter", 7),
+            # ('["spam"', "Expecting ',' delimiter", 7),
             ('["spam",', 'Expecting value', 8),
-            ('{', 'Expecting property name enclosed in double quotes', 1),
+            ('{', 'Invalid keynam', 1),
             ('{"', 'Unterminated string starting at', 1),
             ('{"spam', 'Unterminated string starting at', 1),
             ('{"spam"', "Expecting ':' delimiter", 7),
             ('{"spam":', 'Expecting value', 8),
-            ('{"spam":42', "Expecting ',' delimiter", 10),
-            ('{"spam":42,', 'Expecting property name enclosed in double quotes',
-             11),
+            # ('{"spam":42', "Expecting ',' delimiter", 10),
+            ('{"spam":42,', 'Invalid keyname', 11),
             ('"', 'Unterminated string starting at', 0),
             ('"spam', 'Unterminated string starting at', 0),
-            ('[,', "Expecting value", 1),
+            ('[,', "Expecting value", 2),
         ]
         for data, msg, idx in test_cases:
             try:

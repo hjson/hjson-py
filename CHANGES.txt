@@ -1,4 +1,5 @@
 
-Version 1.0 released 2015
+Version 1.0 released 2015-01-
 
- * Initial release
+ * Initial Hjson release
+ * forked from https://github.com/simplejson/simplejson

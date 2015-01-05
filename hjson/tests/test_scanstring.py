@@ -15,12 +15,7 @@ class TestScanString(TestCase):
     # entirely different code paths for parsing bytes and str.
     #
     def test_py_scanstring(self):
-        self._test_scanstring(hjson.decoder.py_scanstring)
-
-    def test_c_scanstring(self):
-        if not hjson.decoder.c_scanstring:
-            return
-        self._test_scanstring(hjson.decoder.c_scanstring)
+        self._test_scanstring(hjson.decoder.scanstring)
 
     def _test_scanstring(self, scanstring):
         if sys.maxunicode == 65535:

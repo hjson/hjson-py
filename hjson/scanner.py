@@ -58,10 +58,12 @@ def errmsg(msg, doc, pos, end=None):
     return fmt % (msg, lineno, colno, endlineno, endcolno, pos, end)
 
 
-def py_make_scanner(context):
+def make_scanner(context):
     parse_object = context.parse_object
     parse_array = context.parse_array
     parse_string = context.parse_string
+    parse_uqstring = context.parse_uqstring
+    parse_mlstring = context.parse_mlstring
     match_number = NUMBER_RE.match
     encoding = context.encoding
     strict = context.strict
@@ -75,23 +77,25 @@ def py_make_scanner(context):
     def _scan_once(string, idx):
         errmsg = 'Expecting value'
         try:
-            nextchar = string[idx]
+            ch = string[idx]
         except IndexError:
             raise JSONDecodeError(errmsg, string, idx)
 
-        if nextchar == '"':
+        if ch == '"':
             return parse_string(string, idx + 1, encoding, strict)
-        elif nextchar == '{':
+        elif ch == '{':
             return parse_object((string, idx + 1), encoding, strict,
                 _scan_once, object_hook, object_pairs_hook, memo)
-        elif nextchar == '[':
+        elif ch == '[':
             return parse_array((string, idx + 1), _scan_once)
-        elif nextchar == 'n' and string[idx:idx + 4] == 'null':
+        elif ch == 'n' and string[idx:idx + 4] == 'null':
             return None, idx + 4
-        elif nextchar == 't' and string[idx:idx + 4] == 'true':
+        elif ch == 't' and string[idx:idx + 4] == 'true':
             return True, idx + 4
-        elif nextchar == 'f' and string[idx:idx + 5] == 'false':
+        elif ch == 'f' and string[idx:idx + 5] == 'false':
             return False, idx + 5
+        elif ch == '\'' and string[idx:idx + 3] == '\'\'\'':
+            return parse_mlstring(string, idx)
 
         m = match_number(string, idx)
         if m is not None:
@@ -101,12 +105,14 @@ def py_make_scanner(context):
             else:
                 res = parse_int(integer)
             return res, m.end()
-        elif nextchar == 'N' and string[idx:idx + 3] == 'NaN':
+        elif ch == 'N' and string[idx:idx + 3] == 'NaN':
             return parse_constant('NaN'), idx + 3
-        elif nextchar == 'I' and string[idx:idx + 8] == 'Infinity':
+        elif ch == 'I' and string[idx:idx + 8] == 'Infinity':
             return parse_constant('Infinity'), idx + 8
-        elif nextchar == '-' and string[idx:idx + 9] == '-Infinity':
+        elif ch == '-' and string[idx:idx + 9] == '-Infinity':
             return parse_constant('-Infinity'), idx + 9
+        elif ch != '-' and (ch < '0' or ch > '9'):
+            return parse_uqstring(string, idx)
         else:
             raise JSONDecodeError(errmsg, string, idx)
 
@@ -122,5 +128,3 @@ def py_make_scanner(context):
             memo.clear()
 
     return scan_once
-
-make_scanner = py_make_scanner

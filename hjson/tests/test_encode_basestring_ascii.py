@@ -24,12 +24,7 @@ CASES = [
 
 class TestEncodeBaseStringAscii(TestCase):
     def test_py_encode_basestring_ascii(self):
-        self._test_encode_basestring_ascii(hjson.encoder.py_encode_basestring_ascii)
-
-    def test_c_encode_basestring_ascii(self):
-        if not hjson.encoder.c_encode_basestring_ascii:
-            return
-        self._test_encode_basestring_ascii(hjson.encoder.c_encode_basestring_ascii)
+        self._test_encode_basestring_ascii(hjson.encoder.encode_basestring_ascii)
 
     def _test_encode_basestring_ascii(self, encode_basestring_ascii):
         fname = encode_basestring_ascii.__name__

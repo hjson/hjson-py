@@ -12,7 +12,6 @@ def additional_tests(suite=None):
         suite = unittest.TestSuite()
     for mod in (hjson, hjson.encoder, hjson.decoder):
         suite.addTest(doctest.DocTestSuite(mod))
-    suite.addTest(doctest.DocFileSuite('../../index.rst'))
     return suite
 
 
