@@ -10,15 +10,15 @@ from distutils.errors import CCompilerError, DistutilsExecError, \
     DistutilsPlatformError
 
 IS_PYPY = hasattr(sys, 'pypy_translation_info')
-VERSION = '1.0.0'
-DESCRIPTION = "JSON for Humans, allows comments and is less error prone"
+VERSION = '1.0.1'
+DESCRIPTION = "JSON for Humans, allows comments and is less error prone."
 
 with open('README.rst', 'r') as f:
    LONG_DESCRIPTION = f.read()
 
 CLASSIFIERS = filter(None, map(str.strip,
 """
-Development Status :: 5 - Production/Stable
+Development Status :: 4 - Beta
 Intended Audience :: Developers
 License :: OSI Approved :: MIT License
 License :: OSI Approved :: Academic Free License (AFL)
@@ -64,6 +64,7 @@ def run_setup():
         version=VERSION,
         description=DESCRIPTION,
         long_description=LONG_DESCRIPTION,
+        keywords="json comments configuration",
         classifiers=CLASSIFIERS,
         author="Christian Zangl",
         author_email="coralllama@gmail.com",
