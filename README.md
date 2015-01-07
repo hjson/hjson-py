@@ -10,6 +10,10 @@ Hjson works with Python 2.5+ and Python 3.3+ (forked from simplejson)
 
 # BETA
 
+**The parser is implemented and fully functional** (see `load`/`loads`).
+
+The encoder currently outputs JSON but will return Hjson in a future update (see `dump`/`dumps`).
+
 Please test and report bugs.
 
 # Installation

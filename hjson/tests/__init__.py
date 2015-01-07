@@ -19,6 +19,7 @@ def all_tests_suite():
     def get_suite():
         return additional_tests(
             unittest.TestLoader().loadTestsFromNames([
+                'hjson.tests.test_hjson',
                 'hjson.tests.test_bitsize_int_as_string',
                 'hjson.tests.test_bigint_as_string',
                 'hjson.tests.test_check_circular',

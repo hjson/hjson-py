@@ -244,8 +244,7 @@ def scankey(s, end, encoding=None, strict=True):
         elif ch >= 'a' and ch <= 'z' or ch >= 'A' and ch <= 'Z' or ch >= '0' and ch <= '9':
             end += 1
         else:
-            raise JSONDecodeError(
-                "Invalid keyname starting at", s, begin)
+            raise JSONDecodeError("Bad name at", s, begin)
 
 
 def JSONObject(state, encoding, strict, scan_once, object_hook,
