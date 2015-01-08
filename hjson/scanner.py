@@ -4,10 +4,6 @@ import re
 
 __all__ = ['make_scanner', 'JSONDecodeError']
 
-NUMBER_RE = re.compile(
-    r'(-?(?:0|[1-9]\d*))(\.\d+)?([eE][-+]?\d+)?',
-    (re.VERBOSE | re.MULTILINE | re.DOTALL))
-
 class JSONDecodeError(ValueError):
     """Subclass of ValueError with the following additional properties:
 
@@ -62,24 +58,19 @@ def make_scanner(context):
     parse_object = context.parse_object
     parse_array = context.parse_array
     parse_string = context.parse_string
-    parse_uqstring = context.parse_uqstring
     parse_mlstring = context.parse_mlstring
-    match_number = NUMBER_RE.match
+    parse_tfnns = context.parse_tfnns
     encoding = context.encoding
     strict = context.strict
-    parse_float = context.parse_float
-    parse_int = context.parse_int
-    parse_constant = context.parse_constant
     object_hook = context.object_hook
     object_pairs_hook = context.object_pairs_hook
     memo = context.memo
 
     def _scan_once(string, idx):
-        errmsg = 'Expecting value'
         try:
             ch = string[idx]
         except IndexError:
-            raise JSONDecodeError(errmsg, string, idx)
+            raise JSONDecodeError('Expecting value', string, idx)
 
         if ch == '"':
             return parse_string(string, idx + 1, encoding, strict)
@@ -88,33 +79,10 @@ def make_scanner(context):
                 _scan_once, object_hook, object_pairs_hook, memo)
         elif ch == '[':
             return parse_array((string, idx + 1), _scan_once)
-        elif ch == 'n' and string[idx:idx + 4] == 'null':
-            return None, idx + 4
-        elif ch == 't' and string[idx:idx + 4] == 'true':
-            return True, idx + 4
-        elif ch == 'f' and string[idx:idx + 5] == 'false':
-            return False, idx + 5
         elif ch == '\'' and string[idx:idx + 3] == '\'\'\'':
             return parse_mlstring(string, idx)
 
-        m = match_number(string, idx)
-        if m is not None:
-            integer, frac, exp = m.groups()
-            if frac or exp:
-                res = parse_float(integer + (frac or '') + (exp or ''))
-            else:
-                res = parse_int(integer)
-            return res, m.end()
-        elif ch == 'N' and string[idx:idx + 3] == 'NaN':
-            return parse_constant('NaN'), idx + 3
-        elif ch == 'I' and string[idx:idx + 8] == 'Infinity':
-            return parse_constant('Infinity'), idx + 8
-        elif ch == '-' and string[idx:idx + 9] == '-Infinity':
-            return parse_constant('-Infinity'), idx + 9
-        elif ch != '-' and (ch < '0' or ch > '9'):
-            return parse_uqstring(string, idx)
-        else:
-            raise JSONDecodeError(errmsg, string, idx)
+        return parse_tfnns(context, string, idx)
 
     def scan_once(string, idx):
         if idx < 0:

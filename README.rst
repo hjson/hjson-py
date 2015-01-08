@@ -5,3 +5,11 @@ It supports `#`, `//` and `/**/` style comments as well as avoiding trailing/mis
 Hjson works with Python 2.5+ and Python 3.3+ (forked from simplejson)
 
 API: See the simplejson docs: http://simplejson.readthedocs.org/
+
+BETA::
+
+*The parser is implemented and fully functional.*
+
+The encoder currently outputs JSON but will return Hjson in a future update.
+
+Please test and report bugs.

@@ -111,11 +111,11 @@ class JSONEncoder(object):
     key_separator = ': '
 
     def __init__(self, skipkeys=False, ensure_ascii=True,
-                 check_circular=True, allow_nan=True, sort_keys=False,
+                 check_circular=True, sort_keys=False,
                  indent=None, separators=None, encoding='utf-8', default=None,
                  use_decimal=True, namedtuple_as_object=True,
                  tuple_as_array=True, bigint_as_string=False,
-                 item_sort_key=None, for_json=False, ignore_nan=False,
+                 item_sort_key=None, for_json=False,
                  int_as_string_bitcount=None):
         """Constructor for JSONEncoder, with sensible defaults.
 
@@ -131,11 +131,6 @@ class JSONEncoder(object):
         objects will be checked for circular references during encoding to
         prevent an infinite recursion (which would cause an OverflowError).
         Otherwise, no such check takes place.
-
-        If allow_nan is true, then NaN, Infinity, and -Infinity will be
-        encoded as such.  This behavior is not JSON specification compliant,
-        but is consistent with most JavaScript based encoders and decoders.
-        Otherwise, it will be a ValueError to encode such floats.
 
         If sort_keys is true, then the output of dictionaries will be
         sorted by key; this is useful for regression tests to ensure
@@ -187,17 +182,11 @@ class JSONEncoder(object):
         method will use the return value of that method for encoding as JSON
         instead of the object.
 
-        If *ignore_nan* is true (default: ``False``), then out of range
-        :class:`float` values (``nan``, ``inf``, ``-inf``) will be serialized
-        as ``null`` in compliance with the ECMA-262 specification. If true,
-        this will override *allow_nan*.
-
         """
 
         self.skipkeys = skipkeys
         self.ensure_ascii = ensure_ascii
         self.check_circular = check_circular
-        self.allow_nan = allow_nan
         self.sort_keys = sort_keys
         self.use_decimal = use_decimal
         self.namedtuple_as_object = namedtuple_as_object
@@ -205,7 +194,6 @@ class JSONEncoder(object):
         self.bigint_as_string = bigint_as_string
         self.item_sort_key = item_sort_key
         self.for_json = for_json
-        self.ignore_nan = ignore_nan
         self.int_as_string_bitcount = int_as_string_bitcount
         if indent is not None and not isinstance(indent, string_types):
             indent = indent * ' '
@@ -291,27 +279,19 @@ class JSONEncoder(object):
                     o = o.decode(_encoding)
                 return _orig_encoder(o)
 
-        def floatstr(o, allow_nan=self.allow_nan, ignore_nan=self.ignore_nan,
-                _repr=FLOAT_REPR, _inf=PosInf, _neginf=-PosInf):
+        def floatstr(o, _repr=FLOAT_REPR, _inf=PosInf, _neginf=-PosInf):
             # Check for specials. Note that this type of test is processor
             # and/or platform-specific, so do tests which don't depend on
             # the internals.
 
             if o != o:
-                text = 'NaN'
+                text = 'null'
             elif o == _inf:
-                text = 'Infinity'
+                text = 'null'
             elif o == _neginf:
-                text = '-Infinity'
+                text = 'null'
             else:
                 return _repr(o)
-
-            if ignore_nan:
-                text = 'null'
-            elif not allow_nan:
-                raise ValueError(
-                    "Out of range float values are not JSON compliant: " +
-                    repr(o))
 
             return text
 

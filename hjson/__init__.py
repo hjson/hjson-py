@@ -1,6 +1,7 @@
-r"""JSON (JavaScript Object Notation) <http://json.org> is a subset of
-JavaScript syntax (ECMA-262 3rd edition) used as a lightweight data
-interchange format.
+r"""Hjson, the Human JSON. A configuration file format that caters to
+humans and helps reduce the errors they make.
+
+For details and syntax see http://laktak.github.io/hjson.
 
 :mod:`hjson` exposes an API familiar to users of the standard library
 :mod:`marshal` and :mod:`pickle` modules. It is the externally maintained
@@ -42,7 +43,7 @@ Pretty printing::
         "6": 7
     }
 
-Decoding JSON::
+Decoding Hjson::
 
     >>> import hjson as json
     >>> obj = [u'foo', {u'bar': [u'baz', None, 1.0, 2]}]
@@ -96,7 +97,7 @@ Using hjson.tool from the shell to validate and pretty-print::
     Expecting property name: line 1 column 3 (char 2)
 """
 from __future__ import absolute_import
-__version__ = '1.0.0'
+__version__ = '1.1.0'
 __all__ = [
     'dump', 'dumps', 'load', 'loads',
     'JSONDecoder', 'JSONDecodeError', 'JSONEncoder',
@@ -125,7 +126,6 @@ _default_encoder = JSONEncoder(
     skipkeys=False,
     ensure_ascii=True,
     check_circular=True,
-    allow_nan=True,
     indent=None,
     separators=None,
     encoding='utf-8',
@@ -136,16 +136,15 @@ _default_encoder = JSONEncoder(
     bigint_as_string=False,
     item_sort_key=None,
     for_json=False,
-    ignore_nan=False,
     int_as_string_bitcount=None,
 )
 
 def dump(obj, fp, skipkeys=False, ensure_ascii=True, check_circular=True,
-         allow_nan=True, cls=None, indent=None, separators=None,
+         cls=None, indent=None, separators=None,
          encoding='utf-8', default=None, use_decimal=True,
          namedtuple_as_object=True, tuple_as_array=True,
          bigint_as_string=False, sort_keys=False, item_sort_key=None,
-         for_json=False, ignore_nan=False, int_as_string_bitcount=None, **kw):
+         for_json=False, int_as_string_bitcount=None, **kw):
     """Serialize ``obj`` as a JSON formatted stream to ``fp`` (a
     ``.write()``-supporting file-like object).
 
@@ -162,12 +161,6 @@ def dump(obj, fp, skipkeys=False, ensure_ascii=True, check_circular=True,
     If *check_circular* is false, then the circular reference check
     for container types will be skipped and a circular reference will
     result in an ``OverflowError`` (or worse).
-
-    If *allow_nan* is false, then it will be a ``ValueError`` to
-    serialize out of range ``float`` values (``nan``, ``inf``, ``-inf``)
-    in strict compliance of the original JSON specification, instead of using
-    the JavaScript equivalents (``NaN``, ``Infinity``, ``-Infinity``). See
-    *ignore_nan* for ECMA-262 compliant behavior.
 
     If *indent* is a string, then JSON array elements and object members
     will be pretty-printed with a newline followed by that string repeated
@@ -219,11 +212,6 @@ def dump(obj, fp, skipkeys=False, ensure_ascii=True, check_circular=True,
     method will use the return value of that method for encoding as JSON
     instead of the object.
 
-    If *ignore_nan* is true (default: ``False``), then out of range
-    :class:`float` values (``nan``, ``inf``, ``-inf``) will be serialized as
-    ``null`` in compliance with the ECMA-262 specification. If true, this will
-    override *allow_nan*.
-
     To use a custom ``JSONEncoder`` subclass (e.g. one that overrides the
     ``.default()`` method to serialize additional types), specify it with
     the ``cls`` kwarg. NOTE: You should use *default* or *for_json* instead
@@ -232,13 +220,13 @@ def dump(obj, fp, skipkeys=False, ensure_ascii=True, check_circular=True,
     """
     # cached encoder
     if (not skipkeys and ensure_ascii and
-        check_circular and allow_nan and
+        check_circular and
         cls is None and indent is None and separators is None and
         encoding == 'utf-8' and default is None and use_decimal
         and namedtuple_as_object and tuple_as_array
         and not bigint_as_string and not sort_keys
         and not item_sort_key and not for_json
-        and not ignore_nan and int_as_string_bitcount is None
+        and int_as_string_bitcount is None
         and not kw
     ):
         iterable = _default_encoder.iterencode(obj)
@@ -246,7 +234,7 @@ def dump(obj, fp, skipkeys=False, ensure_ascii=True, check_circular=True,
         if cls is None:
             cls = JSONEncoder
         iterable = cls(skipkeys=skipkeys, ensure_ascii=ensure_ascii,
-            check_circular=check_circular, allow_nan=allow_nan, indent=indent,
+            check_circular=check_circular, indent=indent,
             separators=separators, encoding=encoding,
             default=default, use_decimal=use_decimal,
             namedtuple_as_object=namedtuple_as_object,
@@ -255,7 +243,6 @@ def dump(obj, fp, skipkeys=False, ensure_ascii=True, check_circular=True,
             sort_keys=sort_keys,
             item_sort_key=item_sort_key,
             for_json=for_json,
-            ignore_nan=ignore_nan,
             int_as_string_bitcount=int_as_string_bitcount,
             **kw).iterencode(obj)
     # could accelerate with writelines in some versions of Python, at
@@ -265,11 +252,11 @@ def dump(obj, fp, skipkeys=False, ensure_ascii=True, check_circular=True,
 
 
 def dumps(obj, skipkeys=False, ensure_ascii=True, check_circular=True,
-          allow_nan=True, cls=None, indent=None, separators=None,
+          cls=None, indent=None, separators=None,
           encoding='utf-8', default=None, use_decimal=True,
           namedtuple_as_object=True, tuple_as_array=True,
           bigint_as_string=False, sort_keys=False, item_sort_key=None,
-          for_json=False, ignore_nan=False, int_as_string_bitcount=None, **kw):
+          for_json=False, int_as_string_bitcount=None, **kw):
     """Serialize ``obj`` to a JSON formatted ``str``.
 
     If ``skipkeys`` is false then ``dict`` keys that are not basic types
@@ -283,11 +270,6 @@ def dumps(obj, skipkeys=False, ensure_ascii=True, check_circular=True,
     If ``check_circular`` is false, then the circular reference check
     for container types will be skipped and a circular reference will
     result in an ``OverflowError`` (or worse).
-
-    If ``allow_nan`` is false, then it will be a ``ValueError`` to
-    serialize out of range ``float`` values (``nan``, ``inf``, ``-inf``) in
-    strict compliance of the JSON specification, instead of using the
-    JavaScript equivalents (``NaN``, ``Infinity``, ``-Infinity``).
 
     If ``indent`` is a string, then JSON array elements and object members
     will be pretty-printed with a newline followed by that string repeated
@@ -337,11 +319,6 @@ def dumps(obj, skipkeys=False, ensure_ascii=True, check_circular=True,
     method will use the return value of that method for encoding as JSON
     instead of the object.
 
-    If *ignore_nan* is true (default: ``False``), then out of range
-    :class:`float` values (``nan``, ``inf``, ``-inf``) will be serialized as
-    ``null`` in compliance with the ECMA-262 specification. If true, this will
-    override *allow_nan*.
-
     To use a custom ``JSONEncoder`` subclass (e.g. one that overrides the
     ``.default()`` method to serialize additional types), specify it with
     the ``cls`` kwarg. NOTE: You should use *default* instead of subclassing
@@ -351,13 +328,13 @@ def dumps(obj, skipkeys=False, ensure_ascii=True, check_circular=True,
     # cached encoder
     if (
         not skipkeys and ensure_ascii and
-        check_circular and allow_nan and
+        check_circular and
         cls is None and indent is None and separators is None and
         encoding == 'utf-8' and default is None and use_decimal
         and namedtuple_as_object and tuple_as_array
         and not bigint_as_string and not sort_keys
         and not item_sort_key and not for_json
-        and not ignore_nan and int_as_string_bitcount is None
+        and int_as_string_bitcount is None
         and not kw
     ):
         return _default_encoder.encode(obj)
@@ -365,7 +342,7 @@ def dumps(obj, skipkeys=False, ensure_ascii=True, check_circular=True,
         cls = JSONEncoder
     return cls(
         skipkeys=skipkeys, ensure_ascii=ensure_ascii,
-        check_circular=check_circular, allow_nan=allow_nan, indent=indent,
+        check_circular=check_circular, indent=indent,
         separators=separators, encoding=encoding, default=default,
         use_decimal=use_decimal,
         namedtuple_as_object=namedtuple_as_object,
@@ -374,7 +351,6 @@ def dumps(obj, skipkeys=False, ensure_ascii=True, check_circular=True,
         sort_keys=sort_keys,
         item_sort_key=item_sort_key,
         for_json=for_json,
-        ignore_nan=ignore_nan,
         int_as_string_bitcount=int_as_string_bitcount,
         **kw).encode(obj)
 
@@ -384,7 +360,7 @@ _default_decoder = JSONDecoder(encoding=None, object_hook=None,
 
 
 def load(fp, encoding=None, cls=None, object_hook=None, parse_float=None,
-        parse_int=None, parse_constant=None, object_pairs_hook=None,
+        parse_int=None, object_pairs_hook=None,
         use_decimal=False, namedtuple_as_object=True, tuple_as_array=True,
         **kw):
     """Deserialize ``fp`` (a ``.read()``-supporting file-like object containing
@@ -421,11 +397,6 @@ def load(fp, encoding=None, cls=None, object_hook=None, parse_float=None,
     ``int(num_str)``.  This can be used to use another datatype or parser
     for JSON integers (e.g. :class:`float`).
 
-    *parse_constant*, if specified, will be called with one of the
-    following strings: ``'-Infinity'``, ``'Infinity'``, ``'NaN'``.  This
-    can be used to raise an exception if invalid JSON numbers are
-    encountered.
-
     If *use_decimal* is true (default: ``False``) then it implies
     parse_float=decimal.Decimal for parity with ``dump``.
 
@@ -437,12 +408,12 @@ def load(fp, encoding=None, cls=None, object_hook=None, parse_float=None,
     return loads(fp.read(),
         encoding=encoding, cls=cls, object_hook=object_hook,
         parse_float=parse_float, parse_int=parse_int,
-        parse_constant=parse_constant, object_pairs_hook=object_pairs_hook,
+        object_pairs_hook=object_pairs_hook,
         use_decimal=use_decimal, **kw)
 
 
 def loads(s, encoding=None, cls=None, object_hook=None, parse_float=None,
-        parse_int=None, parse_constant=None, object_pairs_hook=None,
+        parse_int=None, object_pairs_hook=None,
         use_decimal=False, **kw):
     """Deserialize ``s`` (a ``str`` or ``unicode`` instance containing a JSON
     document) to a Python object.
@@ -478,11 +449,6 @@ def loads(s, encoding=None, cls=None, object_hook=None, parse_float=None,
     ``int(num_str)``.  This can be used to use another datatype or parser
     for JSON integers (e.g. :class:`float`).
 
-    *parse_constant*, if specified, will be called with one of the
-    following strings: ``'-Infinity'``, ``'Infinity'``, ``'NaN'``.  This
-    can be used to raise an exception if invalid JSON numbers are
-    encountered.
-
     If *use_decimal* is true (default: ``False``) then it implies
     parse_float=decimal.Decimal for parity with ``dump``.
 
@@ -493,7 +459,7 @@ def loads(s, encoding=None, cls=None, object_hook=None, parse_float=None,
     """
     if (cls is None and encoding is None and object_hook is None and
             parse_int is None and parse_float is None and
-            parse_constant is None and object_pairs_hook is None
+            object_pairs_hook is None
             and not use_decimal and not kw):
         return _default_decoder.decode(s)
     if cls is None:
@@ -506,8 +472,6 @@ def loads(s, encoding=None, cls=None, object_hook=None, parse_float=None,
         kw['parse_float'] = parse_float
     if parse_int is not None:
         kw['parse_int'] = parse_int
-    if parse_constant is not None:
-        kw['parse_constant'] = parse_constant
     if use_decimal:
         if parse_float is not None:
             raise TypeError("use_decimal=True implies parse_float=Decimal")

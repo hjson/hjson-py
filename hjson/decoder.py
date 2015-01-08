@@ -24,13 +24,11 @@ def _floatconstants():
 
 NaN, PosInf, NegInf = _floatconstants()
 
-_CONSTANTS = {
-    '-Infinity': NegInf,
-    'Infinity': PosInf,
-    'NaN': NaN,
-}
-
 WHITESPACE = ' \t\n\r'
+
+NUMBER_RE = re.compile(
+    r'[\t ]*(-?(?:0|[1-9]\d*))(\.\d+)?([eE][-+]?\d+)?[\t ]*',
+    (re.VERBOSE | re.DOTALL))
 
 STRINGCHUNK = re.compile(r'(.*?)(["\\\x00-\x1f])', FLAGS)
 BACKSLASH = {
@@ -174,10 +172,6 @@ def scanstring(s, end, encoding=None, strict=True,
 def mlscanstring(s, end):
     """Scan a multiline string"""
 
-    # ch, begin = getNext(s, end)
-    # end = getEol(s, begin)
-    #return s[begin:end], end
-
     string = ""
     triple = 0
 
@@ -218,14 +212,43 @@ def mlscanstring(s, end):
             string += ch
             end += 1
 
-def uqscanstring(s, end):
-    """Scan the string s until eol. see scanstring"""
+def scantfnns(context, s, end):
+    """Scan s until eol. return string, True, False or None"""
 
-    ch, begin = getNext(s, end)
-    end = getEol(s, begin)
-    #ch, end2 = getNext(s, end)
+    chf, begin = getNext(s, end)
+    end = begin
 
-    return s[begin:end], end
+    while 1:
+        ch = s[end:end + 1]
+
+        next = ch == ',' or ch == '}' or ch == ']'
+        if next or ch == '\r' or ch == '\n' or ch == '':
+            m = None
+            mend = end
+            if next: mend -= 1
+
+            if chf == 'n' and s[begin:end].strip() == 'null':
+                return None, end
+            elif chf == 't' and s[begin:end].strip() == 'true':
+                return True, end
+            elif chf == 'f' and s[begin:end].strip() == 'false':
+                return False, end
+            elif chf == '-' or chf >= '0' and chf <= '9':
+                m = NUMBER_RE.match(s, begin)
+
+            if m is not None and m.end() == end:
+                integer, frac, exp = m.groups()
+                if frac or exp:
+                    res = context.parse_float(integer + (frac or '') + (exp or ''))
+                    if int(res) == res: res = int(res)
+                else:
+                    res = context.parse_int(integer)
+                return res, end
+
+            if not next:
+                return s[begin:end], end
+
+        end += 1
 
 def scankey(s, end, encoding=None, strict=True):
     """Scan the string s for a JSON/Hjson key. see scanstring"""
@@ -353,13 +376,10 @@ class JSONDecoder(object):
     | null          | None              |
     +---------------+-------------------+
 
-    It also understands ``NaN``, ``Infinity``, and ``-Infinity`` as
-    their corresponding ``float`` values, which is outside the JSON spec.
-
     """
 
     def __init__(self, encoding=None, object_hook=None, parse_float=None,
-            parse_int=None, parse_constant=None, strict=True,
+            parse_int=None, strict=True,
             object_pairs_hook=None):
         """
         *encoding* determines the encoding used to interpret any
@@ -393,11 +413,6 @@ class JSONDecoder(object):
         ``int(num_str)``.  This can be used to use another datatype or parser
         for JSON integers (e.g. :class:`float`).
 
-        *parse_constant*, if specified, will be called with one of the
-        following strings: ``'-Infinity'``, ``'Infinity'``, ``'NaN'``.  This
-        can be used to raise an exception if invalid JSON numbers are
-        encountered.
-
         *strict* controls the parser's behavior when it encounters an
         invalid control character in a string. The default setting of
         ``True`` means that unescaped control characters are parse errors, if
@@ -411,13 +426,12 @@ class JSONDecoder(object):
         self.object_pairs_hook = object_pairs_hook
         self.parse_float = parse_float or float
         self.parse_int = parse_int or int
-        self.parse_constant = parse_constant or _CONSTANTS.__getitem__
         self.strict = strict
         self.parse_object = JSONObject
         self.parse_array = JSONArray
         self.parse_string = scanstring
-        self.parse_uqstring = uqscanstring
         self.parse_mlstring = mlscanstring
+        self.parse_tfnns = scantfnns
         self.memo = {}
         self.scan_once = make_scanner(self)
 
