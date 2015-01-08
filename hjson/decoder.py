@@ -209,7 +209,8 @@ def mlscanstring(s, end):
             string += ch
             end = skipIndent(s, end + 1, indent)
         else:
-            string += ch
+            if ch != '\r':
+                string += ch
             end += 1
 
 def scantfnns(context, s, end):

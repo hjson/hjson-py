@@ -13,6 +13,7 @@ class TestIndent(TestCase):
 
     assetsDir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets")
     assets = os.listdir(assetsDir)
+    maxDiff = None
 
     def get(self, name):
         with open(name, 'rb') as f:
@@ -34,7 +35,8 @@ class TestIndent(TestCase):
 
             try:
                 obj = json.loads(source)
-                self.assertEqual(json.dumps(res["data"]), json.dumps(obj))
+                text = json.dumps(obj)
+                self.assertEqual(json.dumps(res["data"]), text)
             except json.JSONDecodeError as e:
                 # error messages differ, just check if it should throw
                 self.assertTrue(res["err"])
