@@ -1,6 +1,7 @@
 # hjson-py
 
 [![Build Status](https://img.shields.io/travis/laktak/hjson-py.svg?style=flat-square)](http://travis-ci.org/laktak/hjson-py)
+[![PyPI version](https://img.shields.io/pypi/v/hjson.svg?style=flat-square)](https://pypi.python.org/pypi/hjson)
 
 Hjson, the Human JSON. A configuration file format that caters to humans and helps reduce the errors they make.
 
