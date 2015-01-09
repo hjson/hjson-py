@@ -16,28 +16,31 @@ class TestIndent(TestCase):
     maxDiff = None
 
     def get(self, name):
+        name = os.path.join(self.assetsDir, name)
         with open(name, 'rb') as f:
             return f.read()
 
     def test_files(self):
         for file in self.assets:
-            if file[-11:] != "_test.hjson": continue
+            name, sep, ext = file.partition("_test.")
+            if not sep: continue
 
-            file = os.path.join(self.assetsDir, file)
-            name = file[:-11]
+            isJson = ext == "json"
 
-            source = self.get(file)
-            res = json.loads(self.get(name + "_result.json"))
-
-            textfile = name + "_result.txt"
-            # if os.path.exists(textfile):
-            # todo: dump is not yet supported
+            text = self.get(file)
+            shouldFail = name[0:4] == "fail"
 
             try:
-                obj = json.loads(source)
-                text = json.dumps(obj)
-                self.assertEqual(json.dumps(res["data"]), text)
+                data = json.loads(text)
+                text1 = json.dumps(data)
+                self.assertFalse(shouldFail)
+
+                result = json.loads(self.get(name + "_result.json"))
+                text2 = json.dumps(result)
+                self.assertEqual(text2, text1)
+
+                # todo name + "_result.hjson"
+
             except json.JSONDecodeError as e:
-                # error messages differ, just check if it should throw
-                self.assertTrue(res["err"])
+                self.assertTrue(shouldFail)
 

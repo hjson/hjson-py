@@ -50,12 +50,12 @@ def getNext(s, end, _ws=WHITESPACE):
 
         # Hjson allows comments
         ch2 = s[end + 1:end + 2]
-        if ch == "#" or ch == "/" and ch2 == "/":
+        if ch == '#' or ch == '/' and ch2 == '/':
             end = getEol(s, end)
-        elif ch == "/" and ch2 == "*":
+        elif ch == '/' and ch2 == '*':
             end += 2
             ch = s[end]
-            while ch != '' and not (ch == '*' and s[end + 1] == "/"):
+            while ch != '' and not (ch == '*' and s[end + 1] == '/'):
                 end += 1
                 ch = s[end]
             if ch != '':
@@ -222,8 +222,12 @@ def scantfnns(context, s, end):
     while 1:
         ch = s[end:end + 1]
 
-        next = ch == ',' or ch == '}' or ch == ']'
-        if next or ch == '\r' or ch == '\n' or ch == '':
+        isEol = ch == '\r' or ch == '\n' or ch == ''
+        if isEol or ch == ',' or \
+            ch == '}' or ch == ']' or \
+            ch == '#' or \
+            ch == '/' and (s[end + 1:end + 2] == '/' or s[end + 1:end + 2] == '*'):
+
             m = None
             mend = end
             if next: mend -= 1
@@ -246,7 +250,7 @@ def scantfnns(context, s, end):
                     res = context.parse_int(integer)
                 return res, end
 
-            if not next:
+            if isEol:
                 return s[begin:end], end
 
         end += 1
