@@ -32,11 +32,11 @@ class TestIndent(TestCase):
 
             try:
                 data = json.loads(text)
-                text1 = json.dumps(data)
+                text1 = json.dumps(data, sort_keys=True)
                 self.assertFalse(shouldFail)
 
                 result = json.loads(self.get(name + "_result.json"))
-                text2 = json.dumps(result)
+                text2 = json.dumps(result, sort_keys=True)
                 self.assertEqual(text2, text1)
 
                 # todo name + "_result.hjson"
