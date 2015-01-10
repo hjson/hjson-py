@@ -268,11 +268,13 @@ def scankey(s, end, encoding=None, strict=True):
         ch = s[end:end + 1]
 
         if ch == ':':
+            if begin == end:
+                raise JSONDecodeError("Empty key name requires quotes at", s, begin)
             return s[begin:end], end
         elif ch >= 'a' and ch <= 'z' or ch >= 'A' and ch <= 'Z' or ch >= '0' and ch <= '9':
             end += 1
         else:
-            raise JSONDecodeError("Bad name at", s, begin)
+            raise JSONDecodeError("Key names that are not alphanumeric require quotes at", s, begin)
 
 
 def JSONObject(state, encoding, strict, scan_once, object_hook,
