@@ -10,7 +10,7 @@ JSONDOCS = [
     # http://json.org/JSON_checker/test/fail2.json
     '["Unclosed array"',
     # http://json.org/JSON_checker/test/fail3.json
-    '{unquoted_key: "keys must be quoted"}',
+    #'{unquoted_key: "keys must be quoted"}',
     # http://json.org/JSON_checker/test/fail4.json
     # '["extra comma",]',
     # http://json.org/JSON_checker/test/fail5.json

@@ -38,12 +38,12 @@ BACKSLASH = {
 
 DEFAULT_ENCODING = "utf-8"
 
-def getNext(s, end, _ws=WHITESPACE):
+def getNext(s, end):
     while 1:
         # Use a slice to prevent IndexError from being raised
         ch = s[end:end + 1]
         # Skip whitespace.
-        while ch in _ws:
+        while ch in WHITESPACE:
             if ch == '': return ch, end
             end += 1
             ch = s[end:end + 1]
@@ -74,7 +74,7 @@ def getEol(s, end):
             return end
         end += 1
 
-def skipIndent(s, end, n, _ws=WHITESPACE):
+def skipIndent(s, end, n):
     ch = s[end:end + 1]
     while ch != '' and ch in " \t\r" and (n > 0 or n < 0):
         end += 1
@@ -197,6 +197,8 @@ def mlscanstring(s, end):
             triple += 1
             end += 1
             if triple == 3:
+                if string[-1] == '\n':
+                    string = string[:-1] # remove last EOL
                 return string, end
             else:
                 continue
@@ -255,7 +257,7 @@ def scantfnns(context, s, end):
 
         end += 1
 
-def scankey(s, end, encoding=None, strict=True):
+def scanKeyName(s, end, encoding=None, strict=True):
     """Scan the string s for a JSON/Hjson key. see scanstring"""
 
     ch, end = getNext(s, end)
@@ -271,10 +273,11 @@ def scankey(s, end, encoding=None, strict=True):
             if begin == end:
                 raise JSONDecodeError("Empty key name requires quotes at", s, begin)
             return s[begin:end], end
-        elif ch >= 'a' and ch <= 'z' or ch >= 'A' and ch <= 'Z' or ch >= '0' and ch <= '9':
-            end += 1
+        elif ch in WHITESPACE or ch == '{' or ch == '}' or ch == '[' or ch == ']' or ch == ',':
+            raise JSONDecodeError("Key names that include {}[],: or whitespace require quotes at", s, begin)
         else:
-            raise JSONDecodeError("Key names that are not alphanumeric require quotes at", s, begin)
+            end += 1
+
 
 
 def JSONObject(state, encoding, strict, scan_once, object_hook,
@@ -299,7 +302,7 @@ def JSONObject(state, encoding, strict, scan_once, object_hook,
         return pairs, end + 1
 
     while True:
-        key, end = scankey(s, end, encoding, strict)
+        key, end = scanKeyName(s, end, encoding, strict)
         key = memo_get(key, key)
 
         ch, end = getNext(s, end)
