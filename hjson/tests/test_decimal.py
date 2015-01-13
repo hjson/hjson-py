@@ -9,8 +9,8 @@ class TestDecimal(TestCase):
     NUMS = "1.0", "10.00", "1.1", "1234567890.1234567890", "500"
     def dumps(self, obj, **kw):
         sio = StringIO()
-        json.dump(obj, sio, **kw)
-        res = json.dumps(obj, **kw)
+        json.dumpJSON(obj, sio, **kw)
+        res = json.dumpsJSON(obj, **kw)
         self.assertEqual(res, sio.getvalue())
         return res
 
@@ -49,16 +49,16 @@ class TestDecimal(TestCase):
     def test_decimal_defaults(self):
         d = Decimal('1.1')
         # use_decimal=True is the default
-        self.assertRaises(TypeError, json.dumps, d, use_decimal=False)
-        self.assertEqual('1.1', json.dumps(d))
-        self.assertEqual('1.1', json.dumps(d, use_decimal=True))
-        self.assertRaises(TypeError, json.dump, d, StringIO(),
+        self.assertRaises(TypeError, json.dumpsJSON, d, use_decimal=False)
+        self.assertEqual('1.1', json.dumpsJSON(d))
+        self.assertEqual('1.1', json.dumpsJSON(d, use_decimal=True))
+        self.assertRaises(TypeError, json.dumpJSON, d, StringIO(),
                           use_decimal=False)
         sio = StringIO()
-        json.dump(d, sio)
+        json.dumpJSON(d, sio)
         self.assertEqual('1.1', sio.getvalue())
         sio = StringIO()
-        json.dump(d, sio, use_decimal=True)
+        json.dumpJSON(d, sio, use_decimal=True)
         self.assertEqual('1.1', sio.getvalue())
 
     def test_decimal_reload(self):

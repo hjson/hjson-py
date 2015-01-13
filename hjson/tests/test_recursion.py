@@ -22,7 +22,7 @@ class TestRecursion(TestCase):
         x = []
         x.append(x)
         try:
-            json.dumps(x)
+            json.dumpsJSON(x)
         except ValueError:
             pass
         else:
@@ -31,7 +31,7 @@ class TestRecursion(TestCase):
         y = [x]
         x.append(y)
         try:
-            json.dumps(x)
+            json.dumpsJSON(x)
         except ValueError:
             pass
         else:
@@ -39,13 +39,13 @@ class TestRecursion(TestCase):
         y = []
         x = [y, y]
         # ensure that the marker is cleared
-        json.dumps(x)
+        json.dumpsJSON(x)
 
     def test_dictrecursion(self):
         x = {}
         x["test"] = x
         try:
-            json.dumps(x)
+            json.dumpsJSON(x)
         except ValueError:
             pass
         else:
@@ -53,7 +53,7 @@ class TestRecursion(TestCase):
         x = {}
         y = {"a": x, "b": x}
         # ensure that the marker is cleared
-        json.dumps(y)
+        json.dumpsJSON(y)
 
     def test_defaultrecursion(self):
         enc = RecursiveJSONEncoder()

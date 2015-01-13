@@ -71,7 +71,7 @@ JSONDOCS = [
     '{"Comma instead if closing brace": true,',
     # http://json.org/JSON_checker/test/fail33.json
     '["mismatch"}',
-    # http://code.google.com/p/hjson/issues/detail?id=3
+    # http://code.google.com/p/simplejson/issues/detail?id=3
     u'["A\u001FZ control characters in string"]',
     # misc based on coverage
     '{',
@@ -86,17 +86,17 @@ class TestFail(TestCase):
             idx = idx + 1
             try:
                 json.loads(doc)
-            except json.JSONDecodeError:
+            except json.HjsonDecodeError:
                 pass
             else:
                 self.fail("Expected failure for fail%d.json: %r" % (idx, doc))
 
     def test_array_decoder_issue46(self):
-        # http://code.google.com/p/hjson/issues/detail?id=46
+        # http://code.google.com/p/simplejson/issues/detail?id=46
         for doc in [u'[,]', '[,]']:
             try:
                 json.loads(doc)
-            except json.JSONDecodeError:
+            except json.HjsonDecodeError:
                 pass
             except Exception:
                 e = sys.exc_info()[1]
@@ -128,7 +128,7 @@ class TestFail(TestCase):
         for data, msg, idx in test_cases:
             try:
                 json.loads(data)
-            except json.JSONDecodeError:
+            except json.HjsonDecodeError:
                 e = sys.exc_info()[1]
                 self.assertEqual(
                     e.msg[:len(msg)],

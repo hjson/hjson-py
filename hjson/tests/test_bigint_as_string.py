@@ -25,10 +25,10 @@ class TestBigintAsString(TestCase):
             for val, expect in self.values:
                 self.assertEqual(
                     val,
-                    json.loads(json.dumps(val)))
+                    json.loads(json.dumpsJSON(val)))
                 self.assertEqual(
                     expect,
-                    json.loads(json.dumps(val, **opts)))
+                    json.loads(json.dumpsJSON(val, **opts)))
 
     def test_lists(self):
         for opts in self.options:
@@ -37,10 +37,10 @@ class TestBigintAsString(TestCase):
                 expect = [expect, expect]
                 self.assertEqual(
                     val,
-                    json.loads(json.dumps(val)))
+                    json.loads(json.dumpsJSON(val)))
                 self.assertEqual(
                     expect,
-                    json.loads(json.dumps(val, **opts)))
+                    json.loads(json.dumpsJSON(val, **opts)))
 
     def test_dicts(self):
         for opts in self.options:
@@ -49,10 +49,10 @@ class TestBigintAsString(TestCase):
                 expect = {'k': expect}
                 self.assertEqual(
                     val,
-                    json.loads(json.dumps(val)))
+                    json.loads(json.dumpsJSON(val)))
                 self.assertEqual(
                     expect,
-                    json.loads(json.dumps(val, **opts)))
+                    json.loads(json.dumpsJSON(val, **opts)))
 
     def test_dict_keys(self):
         for opts in self.options:
@@ -61,7 +61,7 @@ class TestBigintAsString(TestCase):
                 val = {val: 'value'}
                 self.assertEqual(
                     expect,
-                    json.loads(json.dumps(val)))
+                    json.loads(json.dumpsJSON(val)))
                 self.assertEqual(
                     expect,
-                    json.loads(json.dumps(val, **opts)))
+                    json.loads(json.dumpsJSON(val, **opts)))

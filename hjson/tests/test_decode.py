@@ -74,11 +74,11 @@ class TestDecode(TestCase):
         self.assertEqual(json.loads(u'[""]'), [u""])
 
     def test_raw_decode(self):
-        cls = json.decoder.JSONDecoder
+        cls = json.decoder.HjsonDecoder
         self.assertEqual(
             ({'a': {}}, 9),
             cls().raw_decode("{\"a\": {}}"))
-        # http://code.google.com/p/hjson/issues/detail?id=85
+        # http://code.google.com/p/simplejson/issues/detail?id=85
         self.assertEqual(
             ({'a': {}}, 9),
             cls(object_pairs_hook=dict).raw_decode("{\"a\": {}}"))
@@ -89,7 +89,7 @@ class TestDecode(TestCase):
 
     def test_bounds_checking(self):
         # https://github.com/simplejson/simplejson/issues/98
-        j = json.decoder.JSONDecoder()
+        j = json.decoder.HjsonDecoder()
         for i in [4, 5, 6, -1, -2, -3, -4, -5, -6]:
             self.assertRaises(ValueError, j.scan_once, '1234', i)
             self.assertRaises(ValueError, j.raw_decode, '1234', i)

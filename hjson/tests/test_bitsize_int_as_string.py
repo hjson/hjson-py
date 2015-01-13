@@ -21,22 +21,22 @@ class TestBitSizeIntAsString(TestCase):
         for n in ['foo', -1, 0, 1.0]:
             self.assertRaises(
                 TypeError,
-                json.dumps, 0, int_as_string_bitcount=n)
+                json.dumpsJSON, 0, int_as_string_bitcount=n)
 
     def test_ints_outside_range_fails(self):
         self.assertNotEqual(
             str(1 << 15),
-            json.loads(json.dumps(1 << 15, int_as_string_bitcount=16)),
+            json.loads(json.dumpsJSON(1 << 15, int_as_string_bitcount=16)),
             )
 
     def test_ints(self):
         for val, expect in self.values:
             self.assertEqual(
                 val,
-                json.loads(json.dumps(val)))
+                json.loads(json.dumpsJSON(val)))
             self.assertEqual(
                 expect,
-                json.loads(json.dumps(val, int_as_string_bitcount=31)),
+                json.loads(json.dumpsJSON(val, int_as_string_bitcount=31)),
                 )
 
     def test_lists(self):
@@ -45,10 +45,10 @@ class TestBitSizeIntAsString(TestCase):
             expect = [expect, expect]
             self.assertEqual(
                 val,
-                json.loads(json.dumps(val)))
+                json.loads(json.dumpsJSON(val)))
             self.assertEqual(
                 expect,
-                json.loads(json.dumps(val, int_as_string_bitcount=31)))
+                json.loads(json.dumpsJSON(val, int_as_string_bitcount=31)))
 
     def test_dicts(self):
         for val, expect in self.values:
@@ -56,10 +56,10 @@ class TestBitSizeIntAsString(TestCase):
             expect = {'k': expect}
             self.assertEqual(
                 val,
-                json.loads(json.dumps(val)))
+                json.loads(json.dumpsJSON(val)))
             self.assertEqual(
                 expect,
-                json.loads(json.dumps(val, int_as_string_bitcount=31)))
+                json.loads(json.dumpsJSON(val, int_as_string_bitcount=31)))
 
     def test_dict_keys(self):
         for val, _ in self.values:
@@ -67,7 +67,7 @@ class TestBitSizeIntAsString(TestCase):
             val = {val: 'value'}
             self.assertEqual(
                 expect,
-                json.loads(json.dumps(val)))
+                json.loads(json.dumpsJSON(val)))
             self.assertEqual(
                 expect,
-                json.loads(json.dumps(val, int_as_string_bitcount=31)))
+                json.loads(json.dumpsJSON(val, int_as_string_bitcount=31)))

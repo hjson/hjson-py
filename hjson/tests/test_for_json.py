@@ -31,9 +31,9 @@ class TestForJson(unittest.TestCase):
     def assertRoundTrip(self, obj, other, for_json=True):
         if for_json is None:
             # None will use the default
-            s = json.dumps(obj)
+            s = json.dumpsJSON(obj)
         else:
-            s = json.dumps(obj, for_json=for_json)
+            s = json.dumpsJSON(obj, for_json=for_json)
         self.assertEqual(
             json.loads(s),
             other)
@@ -93,5 +93,5 @@ class TestForJson(unittest.TestCase):
                 for_json=for_json)
 
     def test_raises_typeerror_if_for_json_not_true_with_object(self):
-        self.assertRaises(TypeError, json.dumps, ForJson())
-        self.assertRaises(TypeError, json.dumps, ForJson(), for_json=False)
+        self.assertRaises(TypeError, json.dumpsJSON, ForJson())
+        self.assertRaises(TypeError, json.dumpsJSON, ForJson(), for_json=False)

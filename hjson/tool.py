@@ -12,7 +12,7 @@ Usage::
 """
 from __future__ import with_statement
 import sys
-import hjson as json
+import hjson
 
 def main():
     if len(sys.argv) == 1:
@@ -28,13 +28,11 @@ def main():
         raise SystemExit(sys.argv[0] + " [infile [outfile]]")
     with infile:
         try:
-            obj = json.load(infile,
-                            object_pairs_hook=json.OrderedDict,
-                            use_decimal=True)
+            obj = hjson.load(infile, use_decimal=True)
         except ValueError:
             raise SystemExit(sys.exc_info()[1])
     with outfile:
-        json.dump(obj, outfile, sort_keys=True, indent='    ', use_decimal=True)
+        hjson.dump(obj, outfile, use_decimal=True)
         outfile.write('\n')
 
 

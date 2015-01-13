@@ -32,10 +32,10 @@ class TestIndent(TestCase):
         ]""")
 
 
-        d1 = json.dumps(h)
-        d2 = json.dumps(h, indent='\t', sort_keys=True, separators=(',', ': '))
-        d3 = json.dumps(h, indent='  ', sort_keys=True, separators=(',', ': '))
-        d4 = json.dumps(h, indent=2, sort_keys=True, separators=(',', ': '))
+        d1 = json.dumpsJSON(h)
+        d2 = json.dumpsJSON(h, indent='\t', sort_keys=True, separators=(',', ': '))
+        d3 = json.dumpsJSON(h, indent='  ', sort_keys=True, separators=(',', ': '))
+        d4 = json.dumpsJSON(h, indent=2, sort_keys=True, separators=(',', ': '))
 
         h1 = json.loads(d1)
         h2 = json.loads(d2)
@@ -56,11 +56,11 @@ class TestIndent(TestCase):
     def test_indent0(self):
         h = {3: 1}
         def check(indent, expected):
-            d1 = json.dumps(h, indent=indent)
+            d1 = json.dumpsJSON(h, indent=indent)
             self.assertEqual(d1, expected)
 
             sio = StringIO()
-            json.dump(h, sio, indent=indent)
+            json.dumpJSON(h, sio, indent=indent)
             self.assertEqual(sio.getvalue(), expected)
 
         # indent=0 should emit newlines
@@ -75,12 +75,12 @@ class TestIndent(TestCase):
         # Ensure that separators still works
         self.assertEqual(
             expect_spaces,
-            json.dumps(lst, indent=0, separators=(', ', ': ')))
+            json.dumpsJSON(lst, indent=0, separators=(', ', ': ')))
         # Force the new defaults
         self.assertEqual(
             expect,
-            json.dumps(lst, indent=0, separators=(',', ': ')))
+            json.dumpsJSON(lst, indent=0, separators=(',', ': ')))
         # Added in 2.1.4
         self.assertEqual(
             expect,
-            json.dumps(lst, indent=0))
+            json.dumpsJSON(lst, indent=0))

@@ -31,8 +31,8 @@ class TestSeparators(TestCase):
         ]""")
 
 
-        d1 = json.dumps(h)
-        d2 = json.dumps(h, indent='  ', sort_keys=True, separators=(' ,', ' : '))
+        d1 = json.dumpsJSON(h)
+        d2 = json.dumpsJSON(h, indent='  ', sort_keys=True, separators=(' ,', ' : '))
 
         h1 = json.loads(d1)
         h2 = json.loads(d2)

@@ -6,7 +6,7 @@ http://code.activestate.com/recipes/576693/
 from UserDict import DictMixin
 
 # Modified from original to support Python 2.4, see
-# http://code.google.com/p/hjson/issues/detail?id=53
+# http://code.google.com/p/simplejson/issues/detail?id=53
 try:
     all
 except NameError:
@@ -64,7 +64,7 @@ class OrderedDict(dict, DictMixin):
         if not self:
             raise KeyError('dictionary is empty')
         # Modified from original to support Python 2.4, see
-        # http://code.google.com/p/hjson/issues/detail?id=53
+        # http://code.google.com/p/simplejson/issues/detail?id=53
         if last:
             key = reversed(self).next()
         else:

@@ -6,44 +6,44 @@ import hjson as json
 class TestTuples(unittest.TestCase):
     def test_tuple_array_dumps(self):
         t = (1, 2, 3)
-        expect = json.dumps(list(t))
+        expect = json.dumpsJSON(list(t))
         # Default is True
-        self.assertEqual(expect, json.dumps(t))
-        self.assertEqual(expect, json.dumps(t, tuple_as_array=True))
-        self.assertRaises(TypeError, json.dumps, t, tuple_as_array=False)
+        self.assertEqual(expect, json.dumpsJSON(t))
+        self.assertEqual(expect, json.dumpsJSON(t, tuple_as_array=True))
+        self.assertRaises(TypeError, json.dumpsJSON, t, tuple_as_array=False)
         # Ensure that the "default" does not get called
-        self.assertEqual(expect, json.dumps(t, default=repr))
-        self.assertEqual(expect, json.dumps(t, tuple_as_array=True,
+        self.assertEqual(expect, json.dumpsJSON(t, default=repr))
+        self.assertEqual(expect, json.dumpsJSON(t, tuple_as_array=True,
                                             default=repr))
         # Ensure that the "default" gets called
         self.assertEqual(
-            json.dumps(repr(t)),
-            json.dumps(t, tuple_as_array=False, default=repr))
+            json.dumpsJSON(repr(t)),
+            json.dumpsJSON(t, tuple_as_array=False, default=repr))
 
     def test_tuple_array_dump(self):
         t = (1, 2, 3)
-        expect = json.dumps(list(t))
+        expect = json.dumpsJSON(list(t))
         # Default is True
         sio = StringIO()
-        json.dump(t, sio)
+        json.dumpJSON(t, sio)
         self.assertEqual(expect, sio.getvalue())
         sio = StringIO()
-        json.dump(t, sio, tuple_as_array=True)
+        json.dumpJSON(t, sio, tuple_as_array=True)
         self.assertEqual(expect, sio.getvalue())
-        self.assertRaises(TypeError, json.dump, t, StringIO(),
+        self.assertRaises(TypeError, json.dumpJSON, t, StringIO(),
                           tuple_as_array=False)
         # Ensure that the "default" does not get called
         sio = StringIO()
-        json.dump(t, sio, default=repr)
+        json.dumpJSON(t, sio, default=repr)
         self.assertEqual(expect, sio.getvalue())
         sio = StringIO()
-        json.dump(t, sio, tuple_as_array=True, default=repr)
+        json.dumpJSON(t, sio, tuple_as_array=True, default=repr)
         self.assertEqual(expect, sio.getvalue())
         # Ensure that the "default" gets called
         sio = StringIO()
-        json.dump(t, sio, tuple_as_array=False, default=repr)
+        json.dumpJSON(t, sio, tuple_as_array=False, default=repr)
         self.assertEqual(
-            json.dumps(repr(t)),
+            json.dumpsJSON(repr(t)),
             sio.getvalue())
 
 class TestNamedTuple(unittest.TestCase):

@@ -2,9 +2,9 @@
 """
 import re
 
-__all__ = ['make_scanner', 'JSONDecodeError']
+__all__ = ['make_scanner', 'HjsonDecodeError']
 
-class JSONDecodeError(ValueError):
+class HjsonDecodeError(ValueError):
     """Subclass of ValueError with the following additional properties:
 
     msg: The unformatted error message
@@ -70,7 +70,7 @@ def make_scanner(context):
         try:
             ch = string[idx]
         except IndexError:
-            raise JSONDecodeError('Expecting value', string, idx)
+            raise HjsonDecodeError('Expecting value', string, idx)
 
         if ch == '"':
             return parse_string(string, idx + 1, encoding, strict)
@@ -89,7 +89,7 @@ def make_scanner(context):
             # Ensure the same behavior as the C speedup, otherwise
             # this would work for *some* negative string indices due
             # to the behavior of __getitem__ for strings. #98
-            raise JSONDecodeError('Expecting value', string, idx)
+            raise HjsonDecodeError('Expecting value', string, idx)
         try:
             return _scan_once(string, idx)
         finally:

@@ -17,34 +17,34 @@ class TestUnicode(TestCase):
     def test_encoding2(self):
         u = u'\N{GREEK SMALL LETTER ALPHA}\N{GREEK CAPITAL LETTER OMEGA}'
         s = u.encode('utf-8')
-        ju = json.dumps(u, encoding='utf-8')
-        js = json.dumps(s, encoding='utf-8')
+        ju = json.dumpsJSON(u, encoding='utf-8')
+        js = json.dumpsJSON(s, encoding='utf-8')
         self.assertEqual(ju, js)
 
     def test_encoding3(self):
         u = u'\N{GREEK SMALL LETTER ALPHA}\N{GREEK CAPITAL LETTER OMEGA}'
-        j = json.dumps(u)
+        j = json.dumpsJSON(u)
         self.assertEqual(j, '"\\u03b1\\u03a9"')
 
     def test_encoding4(self):
         u = u'\N{GREEK SMALL LETTER ALPHA}\N{GREEK CAPITAL LETTER OMEGA}'
-        j = json.dumps([u])
+        j = json.dumpsJSON([u])
         self.assertEqual(j, '["\\u03b1\\u03a9"]')
 
     def test_encoding5(self):
         u = u'\N{GREEK SMALL LETTER ALPHA}\N{GREEK CAPITAL LETTER OMEGA}'
-        j = json.dumps(u, ensure_ascii=False)
+        j = json.dumpsJSON(u, ensure_ascii=False)
         self.assertEqual(j, u'"' + u + u'"')
 
     def test_encoding6(self):
         u = u'\N{GREEK SMALL LETTER ALPHA}\N{GREEK CAPITAL LETTER OMEGA}'
-        j = json.dumps([u], ensure_ascii=False)
+        j = json.dumpsJSON([u], ensure_ascii=False)
         self.assertEqual(j, u'["' + u + u'"]')
 
     def test_big_unicode_encode(self):
         u = u'\U0001d120'
-        self.assertEqual(json.dumps(u), '"\\ud834\\udd20"')
-        self.assertEqual(json.dumps(u, ensure_ascii=False), u'"\U0001d120"')
+        self.assertEqual(json.dumpsJSON(u), '"\\ud834\\udd20"')
+        self.assertEqual(json.dumpsJSON(u, ensure_ascii=False), u'"\U0001d120"')
 
     def test_big_unicode_decode(self):
         u = u'z\U0001d120x'
@@ -84,70 +84,70 @@ class TestUnicode(TestCase):
         self.assertEqual(type(json.loads(u'["a"]')[0]), text_type)
 
     def test_ensure_ascii_false_returns_unicode(self):
-        # http://code.google.com/p/hjson/issues/detail?id=48
-        self.assertEqual(type(json.dumps([], ensure_ascii=False)), text_type)
-        self.assertEqual(type(json.dumps(0, ensure_ascii=False)), text_type)
-        self.assertEqual(type(json.dumps({}, ensure_ascii=False)), text_type)
-        self.assertEqual(type(json.dumps("", ensure_ascii=False)), text_type)
+        # http://code.google.com/p/simplejson/issues/detail?id=48
+        self.assertEqual(type(json.dumpsJSON([], ensure_ascii=False)), text_type)
+        self.assertEqual(type(json.dumpsJSON(0, ensure_ascii=False)), text_type)
+        self.assertEqual(type(json.dumpsJSON({}, ensure_ascii=False)), text_type)
+        self.assertEqual(type(json.dumpsJSON("", ensure_ascii=False)), text_type)
 
     def test_ensure_ascii_false_bytestring_encoding(self):
-        # http://code.google.com/p/hjson/issues/detail?id=48
+        # http://code.google.com/p/simplejson/issues/detail?id=48
         doc1 = {u'quux': b('Arr\xc3\xaat sur images')}
         doc2 = {u'quux': u('Arr\xeat sur images')}
         doc_ascii = '{"quux": "Arr\\u00eat sur images"}'
         doc_unicode = u'{"quux": "Arr\xeat sur images"}'
-        self.assertEqual(json.dumps(doc1), doc_ascii)
-        self.assertEqual(json.dumps(doc2), doc_ascii)
-        self.assertEqual(json.dumps(doc1, ensure_ascii=False), doc_unicode)
-        self.assertEqual(json.dumps(doc2, ensure_ascii=False), doc_unicode)
+        self.assertEqual(json.dumpsJSON(doc1), doc_ascii)
+        self.assertEqual(json.dumpsJSON(doc2), doc_ascii)
+        self.assertEqual(json.dumpsJSON(doc1, ensure_ascii=False), doc_unicode)
+        self.assertEqual(json.dumpsJSON(doc2, ensure_ascii=False), doc_unicode)
 
     def test_ensure_ascii_linebreak_encoding(self):
         # http://timelessrepo.com/json-isnt-a-javascript-subset
         s1 = u'\u2029\u2028'
         s2 = s1.encode('utf8')
         expect = '"\\u2029\\u2028"'
-        self.assertEqual(json.dumps(s1), expect)
-        self.assertEqual(json.dumps(s2), expect)
-        self.assertEqual(json.dumps(s1, ensure_ascii=False), expect)
-        self.assertEqual(json.dumps(s2, ensure_ascii=False), expect)
+        self.assertEqual(json.dumpsJSON(s1), expect)
+        self.assertEqual(json.dumpsJSON(s2), expect)
+        self.assertEqual(json.dumpsJSON(s1, ensure_ascii=False), expect)
+        self.assertEqual(json.dumpsJSON(s2, ensure_ascii=False), expect)
 
     def test_invalid_escape_sequences(self):
         # incomplete escape sequence
-        self.assertRaises(json.JSONDecodeError, json.loads, '"\\u')
-        self.assertRaises(json.JSONDecodeError, json.loads, '"\\u1')
-        self.assertRaises(json.JSONDecodeError, json.loads, '"\\u12')
-        self.assertRaises(json.JSONDecodeError, json.loads, '"\\u123')
-        self.assertRaises(json.JSONDecodeError, json.loads, '"\\u1234')
+        self.assertRaises(json.HjsonDecodeError, json.loads, '"\\u')
+        self.assertRaises(json.HjsonDecodeError, json.loads, '"\\u1')
+        self.assertRaises(json.HjsonDecodeError, json.loads, '"\\u12')
+        self.assertRaises(json.HjsonDecodeError, json.loads, '"\\u123')
+        self.assertRaises(json.HjsonDecodeError, json.loads, '"\\u1234')
         # invalid escape sequence
-        self.assertRaises(json.JSONDecodeError, json.loads, '"\\u123x"')
-        self.assertRaises(json.JSONDecodeError, json.loads, '"\\u12x4"')
-        self.assertRaises(json.JSONDecodeError, json.loads, '"\\u1x34"')
-        self.assertRaises(json.JSONDecodeError, json.loads, '"\\ux234"')
+        self.assertRaises(json.HjsonDecodeError, json.loads, '"\\u123x"')
+        self.assertRaises(json.HjsonDecodeError, json.loads, '"\\u12x4"')
+        self.assertRaises(json.HjsonDecodeError, json.loads, '"\\u1x34"')
+        self.assertRaises(json.HjsonDecodeError, json.loads, '"\\ux234"')
         if sys.maxunicode > 65535:
             # invalid escape sequence for low surrogate
-            self.assertRaises(json.JSONDecodeError, json.loads, '"\\ud800\\u"')
-            self.assertRaises(json.JSONDecodeError, json.loads, '"\\ud800\\u0"')
-            self.assertRaises(json.JSONDecodeError, json.loads, '"\\ud800\\u00"')
-            self.assertRaises(json.JSONDecodeError, json.loads, '"\\ud800\\u000"')
-            self.assertRaises(json.JSONDecodeError, json.loads, '"\\ud800\\u000x"')
-            self.assertRaises(json.JSONDecodeError, json.loads, '"\\ud800\\u00x0"')
-            self.assertRaises(json.JSONDecodeError, json.loads, '"\\ud800\\u0x00"')
-            self.assertRaises(json.JSONDecodeError, json.loads, '"\\ud800\\ux000"')
+            self.assertRaises(json.HjsonDecodeError, json.loads, '"\\ud800\\u"')
+            self.assertRaises(json.HjsonDecodeError, json.loads, '"\\ud800\\u0"')
+            self.assertRaises(json.HjsonDecodeError, json.loads, '"\\ud800\\u00"')
+            self.assertRaises(json.HjsonDecodeError, json.loads, '"\\ud800\\u000"')
+            self.assertRaises(json.HjsonDecodeError, json.loads, '"\\ud800\\u000x"')
+            self.assertRaises(json.HjsonDecodeError, json.loads, '"\\ud800\\u00x0"')
+            self.assertRaises(json.HjsonDecodeError, json.loads, '"\\ud800\\u0x00"')
+            self.assertRaises(json.HjsonDecodeError, json.loads, '"\\ud800\\ux000"')
 
     def test_ensure_ascii_still_works(self):
         # in the ascii range, ensure that everything is the same
         for c in map(unichr, range(0, 127)):
             self.assertEqual(
-                json.dumps(c, ensure_ascii=False),
-                json.dumps(c))
+                json.dumpsJSON(c, ensure_ascii=False),
+                json.dumpsJSON(c))
         snowman = u'\N{SNOWMAN}'
         self.assertEqual(
-            json.dumps(c, ensure_ascii=False),
+            json.dumpsJSON(c, ensure_ascii=False),
             '"' + c + '"')
 
     def test_strip_bom(self):
         content = u"\u3053\u3093\u306b\u3061\u308f"
-        json_doc = codecs.BOM_UTF8 + b(json.dumps(content))
+        json_doc = codecs.BOM_UTF8 + b(json.dumpsJSON(content))
         self.assertEqual(json.load(BytesIO(json_doc)), content)
         for doc in json_doc, json_doc.decode('utf8'):
             self.assertEqual(json.loads(doc), content)

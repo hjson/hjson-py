@@ -10,5 +10,5 @@ class TestPass2(TestCase):
     def test_parse(self):
         # test in/out equivalence and parsing
         res = json.loads(JSON)
-        out = json.dumps(res)
+        out = json.dumpsJSON(res)
         self.assertEqual(res, json.loads(out))

@@ -1,15 +1,15 @@
-"""Implementation of JSONDecoder
+"""Implementation of HjsonDecoder
 """
 from __future__ import absolute_import
 import re
 import sys
 import struct
 from .compat import fromhex, b, u, text_type, binary_type, PY3, unichr
-from .scanner import make_scanner, JSONDecodeError
+from .scanner import make_scanner, HjsonDecodeError
 
-# NOTE (3.1.0): JSONDecodeError may still be imported from this module for
+# NOTE (3.1.0): HjsonDecodeError may still be imported from this module for
 # compatibility, but it was never in the __all__
-__all__ = ['JSONDecoder']
+__all__ = ['HjsonDecoder']
 
 FLAGS = re.VERBOSE | re.MULTILINE | re.DOTALL
 
@@ -102,7 +102,7 @@ def scanstring(s, end, encoding=None, strict=True,
     while 1:
         chunk = _m(s, end)
         if chunk is None:
-            raise JSONDecodeError(
+            raise HjsonDecodeError(
                 "Unterminated string starting at", s, begin)
         end = chunk.end()
         content, terminator = chunk.groups()
@@ -118,14 +118,14 @@ def scanstring(s, end, encoding=None, strict=True,
         elif terminator != '\\':
             if strict:
                 msg = "Invalid control character %r at"
-                raise JSONDecodeError(msg, s, end)
+                raise HjsonDecodeError(msg, s, end)
             else:
                 _append(terminator)
                 continue
         try:
             esc = s[end]
         except IndexError:
-            raise JSONDecodeError(
+            raise HjsonDecodeError(
                 "Unterminated string starting at", s, begin)
         # If not a unicode escape sequence, must be in the lookup table
         if esc != 'u':
@@ -133,7 +133,7 @@ def scanstring(s, end, encoding=None, strict=True,
                 char = _b[esc]
             except KeyError:
                 msg = "Invalid \\X escape sequence %r"
-                raise JSONDecodeError(msg, s, end)
+                raise HjsonDecodeError(msg, s, end)
             end += 1
         else:
             # Unicode escape sequence
@@ -141,11 +141,11 @@ def scanstring(s, end, encoding=None, strict=True,
             esc = s[end + 1:end + 5]
             escX = esc[1:2]
             if len(esc) != 4 or escX == 'x' or escX == 'X':
-                raise JSONDecodeError(msg, s, end - 1)
+                raise HjsonDecodeError(msg, s, end - 1)
             try:
                 uni = int(esc, 16)
             except ValueError:
-                raise JSONDecodeError(msg, s, end - 1)
+                raise HjsonDecodeError(msg, s, end - 1)
             end += 5
             # Check for surrogate pair on UCS-4 systems
             # Note that this will join high/low surrogate pairs
@@ -159,7 +159,7 @@ def scanstring(s, end, encoding=None, strict=True,
                     try:
                         uni2 = int(esc2, 16)
                     except ValueError:
-                        raise JSONDecodeError(msg, s, end)
+                        raise HjsonDecodeError(msg, s, end)
                     if uni2 & 0xfc00 == 0xdc00:
                         uni = 0x10000 + (((uni - 0xd800) << 10) |
                                          (uni2 - 0xdc00))
@@ -192,7 +192,7 @@ def mlscanstring(s, end):
     while 1:
         ch = s[end]
         if ch == '':
-            raise JSONDecodeError("Bad multiline string", s, end);
+            raise HjsonDecodeError("Bad multiline string", s, end);
         elif ch == '\'':
             triple += 1
             end += 1
@@ -247,7 +247,7 @@ def scantfnns(context, s, end):
                 integer, frac, exp = m.groups()
                 if frac or exp:
                     res = context.parse_float(integer + (frac or '') + (exp or ''))
-                    if int(res) == res: res = int(res)
+                    if int(res) == res and abs(res)<1e10: res = int(res)
                 else:
                     res = context.parse_int(integer)
                 return res, end
@@ -271,10 +271,10 @@ def scanKeyName(s, end, encoding=None, strict=True):
 
         if ch == ':':
             if begin == end:
-                raise JSONDecodeError("Empty key name requires quotes at", s, begin)
+                raise HjsonDecodeError("Empty key name requires quotes at", s, begin)
             return s[begin:end], end
         elif ch in WHITESPACE or ch == '{' or ch == '}' or ch == '[' or ch == ']' or ch == ',':
-            raise JSONDecodeError("Key names that include {}[],: or whitespace require quotes at", s, begin)
+            raise HjsonDecodeError("Key names that include {}[],: or whitespace require quotes at", s, begin)
         else:
             end += 1
 
@@ -307,7 +307,7 @@ def JSONObject(state, encoding, strict, scan_once, object_hook,
 
         ch, end = getNext(s, end)
         if ch != ':':
-            raise JSONDecodeError("Expecting ':' delimiter", s, end)
+            raise HjsonDecodeError("Expecting ':' delimiter", s, end)
 
         ch, end = getNext(s, end + 1)
 
@@ -343,7 +343,7 @@ def JSONArray(state, scan_once):
     if ch == ']':
         return values, end + 1
     elif ch == '':
-        raise JSONDecodeError("Expecting value or ']'", s, end)
+        raise HjsonDecodeError("Expecting value or ']'", s, end)
     _append = values.append
     while True:
         value, end = scan_once(s, end)
@@ -361,7 +361,7 @@ def JSONArray(state, scan_once):
 
     return values, end
 
-class JSONDecoder(object):
+class HjsonDecoder(object):
     """Hjson <http://laktak.github.io/hjson> decoder
 
     Performs the following translations in decoding by default:
@@ -455,7 +455,7 @@ class JSONDecoder(object):
         obj, end = self.raw_decode(s)
         ch, end = getNext(s, end)
         if end != len(s):
-            raise JSONDecodeError("Extra data", s, end, len(s))
+            raise HjsonDecodeError("Extra data", s, end, len(s))
         return obj
 
     def raw_decode(self, s, idx=0, _PY3=PY3):
@@ -472,7 +472,7 @@ class JSONDecoder(object):
         if idx < 0:
             # Ensure that raw_decode bails on negative indexes, the regex
             # would otherwise mask this behavior. #98
-            raise JSONDecodeError('Expecting value', s, idx)
+            raise HjsonDecodeError('Expecting value', s, idx)
         if _PY3 and not isinstance(s, text_type):
             raise TypeError("Input string must be text, not bytes")
         # strip UTF-8 bom
