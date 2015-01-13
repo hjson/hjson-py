@@ -15,10 +15,30 @@ class TestIndent(TestCase):
     assets = os.listdir(assetsDir)
     maxDiff = None
 
-    def get(self, name):
+    def load(self, name, cr):
         name = os.path.join(self.assetsDir, name)
         with open(name, 'rb') as f:
-            return f.read()
+            text = f.read().replace('\r', '')
+            if cr: text = text.replace('\n', '\r\n')
+            return text
+
+    def check(self, name, file, isJson, inputCr):
+        text = self.load(file, inputCr)
+        shouldFail = name[0:4] == "fail"
+
+        try:
+            data = json.loads(text)
+            text1 = json.dumps(data, sort_keys=True)
+            self.assertFalse(shouldFail)
+
+            result = json.loads(self.load(name + "_result.json", inputCr))
+            text2 = json.dumps(result, sort_keys=True)
+            self.assertEqual(text2, text1)
+
+            # todo name + "_result.hjson"
+
+        except json.JSONDecodeError as e:
+            self.assertTrue(shouldFail)
 
     def test_files(self):
         for file in self.assets:
@@ -26,21 +46,5 @@ class TestIndent(TestCase):
             if not sep: continue
 
             isJson = ext == "json"
-
-            text = self.get(file)
-            shouldFail = name[0:4] == "fail"
-
-            try:
-                data = json.loads(text)
-                text1 = json.dumps(data, sort_keys=True)
-                self.assertFalse(shouldFail)
-
-                result = json.loads(self.get(name + "_result.json"))
-                text2 = json.dumps(result, sort_keys=True)
-                self.assertEqual(text2, text1)
-
-                # todo name + "_result.hjson"
-
-            except json.JSONDecodeError as e:
-                self.assertTrue(shouldFail)
-
+            self.check(name, file, isJson, True)
+            self.check(name, file, isJson, False)
