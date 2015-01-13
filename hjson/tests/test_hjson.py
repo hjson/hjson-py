@@ -18,7 +18,8 @@ class TestAssets(TestCase):
     def load(self, name, cr):
         name = os.path.join(self.assetsDir, name)
         with open(name, 'rb') as f:
-            text = f.read().replace('\r', '')
+            text = f.read().decode('utf-8')
+            text = text.replace('\r', '')
             if cr: text = text.replace('\n', '\r\n')
             return text
 
