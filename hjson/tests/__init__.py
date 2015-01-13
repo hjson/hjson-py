@@ -27,7 +27,6 @@ def all_tests_suite():
                 'hjson.tests.test_default',
                 'hjson.tests.test_dump',
                 'hjson.tests.test_encode_basestring_ascii',
-                'hjson.tests.test_encode_for_html',
                 'hjson.tests.test_errors',
                 'hjson.tests.test_fail',
                 'hjson.tests.test_float',
