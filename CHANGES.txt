@@ -1,5 +1,0 @@
-
-Version 1.0 released 2015-01-
-
- * Initial Hjson release
- * forked from https://github.com/simplejson/simplejson

@@ -32,14 +32,18 @@ class TestAssets(TestCase):
             self.assertFalse(shouldFail)
 
             text1 = hjson.dumpsJSON(data)
-            hjson1 = hjson.dumps(data);
+            hjson1 = hjson.dumps(data, ensure_ascii=False);
             result = hjson.loads(self.load(name + "_result.json", inputCr))
             text2 = hjson.dumpsJSON(result)
             hjson2 = self.load(name + "_result.hjson", False)
 
-            #todo
-            #self.assertEqual(text2, text1)
-            #self.assertEqual(hjson2, hjson1)
+            self.assertEqual(text2, text1)
+            self.assertEqual(hjson2, hjson1)
+
+            # dbg
+            # with open(name + "_dbg1.txt", "w") as tmp: tmp.write(hjson1.encode("utf-8"))
+            # with open(name + "_dbg2.txt", "w") as tmp: tmp.write(hjson2.encode("utf-8"))
+
 
         except hjson.HjsonDecodeError as e:
             self.assertTrue(shouldFail)

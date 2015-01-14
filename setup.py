@@ -10,7 +10,7 @@ from distutils.errors import CCompilerError, DistutilsExecError, \
     DistutilsPlatformError
 
 IS_PYPY = hasattr(sys, 'pypy_translation_info')
-VERSION = '1.3.0'
+VERSION = '1.4.0'
 DESCRIPTION = "JSON for Humans, allows comments and is less error prone."
 
 with open('README.rst', 'r') as f:
@@ -18,7 +18,7 @@ with open('README.rst', 'r') as f:
 
 CLASSIFIERS = filter(None, map(str.strip,
 """
-Development Status :: 4 - Beta
+Development Status :: 5 - Production/Stable
 Intended Audience :: Developers
 License :: OSI Approved :: MIT License
 License :: OSI Approved :: Academic Free License (AFL)

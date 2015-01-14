@@ -9,14 +9,6 @@ It supports `#`, `//` and `/**/` style comments as well as avoiding trailing/mis
 
 Hjson works with Python 2.5+ and Python 3.3+ (forked from simplejson)
 
-# BETA
-
-**The parser is implemented and fully functional** (see `load`/`loads`).
-
-The encoder currently outputs JSON but will return Hjson in a future update (see `dump`/`dumps`).
-
-Please test and report bugs.
-
 # Installation
 
 - `pip install hjson`
@@ -25,18 +17,68 @@ Please test and report bugs.
 
 # Usage
 
-The parser supports the full Hjson syntax:
+```
+import hjson
+```
+
+## Decoding Hjson
 
 ```
-import hjson as hjson
-obj = hjson.loads(hjsonText)
+text = """{
+  foo: a
+  bar: 1
+}"""
+
+hjson.loads(text)
 ```
+
+Result:
+```
+OrderedDict([('foo', 'a'), ('bar', 1)])
+```
+
+## Encoding Python object hierarchies
+
+```
+hjson.dumps({'foo': 'text', 'bar': (1, 2)})
+```
+
+Result:
+```
+{
+  foo: text
+  bar:
+  [
+    1
+    2
+  ]
+}
+```
+
+## Encoding as JSON
+
+Note that this is probably not as performant as the simplejson version.
+
+```
+hjson.dumpsJSON(['foo', {'bar': ('baz', None, 1.0, 2)}])
+```
+
+Result:
+`'["foo", {"bar": ["baz", null, 1.0, 2]}]'`
+
 
 ## From the Commandline
 
-Use hjson.tool to validate and pretty-print:
+Use hjson.tool to validate and convert.
 
-`echo '{"json":"obj"}' | python -m hjson.tool`
+`python -m hjson.tool [FORMAT] [INFILE [OUTFILE]]`
+
+Formats:
+- `-h`: print Hjson
+- `-j`: print formatted JSON
+- `-c`: print compact JSON
+
+E.g. `echo '{"json":"obj"}' | python -m hjson.tool`
 
 # API
 

@@ -8,18 +8,26 @@ For details and syntax see http://laktak.github.io/hjson.
 version of the :mod:`json` library contained in Python 2.6, but maintains
 compatibility with Python 2.4 and Python 2.5.
 
-Encoding Python object hierarchies::
-
-    >>> import hjson as json
-    >>> json.dumps(['foo', {'bar': ('baz', None, 1.0, 2)}])
-    '[\n  foo\n  {\n    bar:\n    [\n      baz\n      null\n      1.0\n      2\n    ]\n  }\n]'
-
 Decoding Hjson::
 
-    >>> import hjson as json
-    >>> obj = [u'foo', {u'bar': [u'baz', None, 1.0, 2]}]
-    >>> json.loads('["foo", {"bar":["baz", null, 1.0, 2]}]') == obj
-    True
+    >>> import hjson
+    >>> text = "{\n  foo: a\n  bar: 1\n}"
+    >>> hjson.loads(text)
+    OrderedDict([('foo', 'a'), ('bar', 1)])
+
+Encoding Python object hierarchies::
+
+    >>> import hjson
+    >>> hjson.dumps({'foo': 'text', 'bar': (1, 2)})
+    '{\n  foo: text\n  bar:\n  [\n    1\n    2\n  ]\n}'
+
+Encoding as JSON::
+
+    Note that this is probably not as performant as the simplejson version.
+
+    >>> import hjson
+    >>> hjson.dumpsJSON(['foo', {'bar': ('baz', None, 1.0, 2)}])
+    '["foo", {"bar": ["baz", null, 1.0, 2]}]'
 
 Using hjson.tool from the shell to validate and pretty-print::
 
@@ -27,9 +35,12 @@ Using hjson.tool from the shell to validate and pretty-print::
     {
       json: obj
     }
+
+    Other formats are -c for compact or -j for formatted JSON.
+
 """
 from __future__ import absolute_import
-__version__ = '1.3.0'
+__version__ = '1.4.0'
 __all__ = [
     'dump', 'dumps', 'load', 'loads',
     'dumpJSON', 'dumpsJSON',

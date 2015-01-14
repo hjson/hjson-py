@@ -56,7 +56,7 @@ def encode_basestring(s, _PY3=PY3, _q=u('"')):
     return _q + ESCAPE.sub(replace, s) + _q
 
 
-def py_encode_basestring_ascii(s, _PY3=PY3):
+def encode_basestring_ascii(s, _PY3=PY3):
     """Return an ASCII-only JSON representation of a Python string
 
     """
@@ -84,9 +84,6 @@ def py_encode_basestring_ascii(s, _PY3=PY3):
                 return '\\u%04x\\u%04x' % (s1, s2)
     return '"' + str(ESCAPE_ASCII.sub(replace, s)) + '"'
 
-
-encode_basestring_ascii = (
-    py_encode_basestring_ascii)
 
 class HjsonEncoder(object):
     """Extensible JSON <http://json.org> encoder for Python data structures.
