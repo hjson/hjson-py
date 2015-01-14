@@ -18,7 +18,8 @@ Decoding Hjson::
 Encoding Python object hierarchies::
 
     >>> import hjson
-    >>> hjson.dumps({'foo': 'text', 'bar': (1, 2)})
+    >>> # hjson.dumps({'foo': 'text', 'bar': (1, 2)})
+    >>> hjson.dumps(OrderedDict([('foo', 'text'), ('bar', (1, 2))]))
     '{\n  foo: text\n  bar:\n  [\n    1\n    2\n  ]\n}'
 
 Encoding as JSON::
