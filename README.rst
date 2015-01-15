@@ -1,14 +1,14 @@
 hjson-py
 ========
 
-Hjson, the Human JSON. A configuration file format that caters to humans
-and helps reduce the errors they make.
+`Hjson`_, the Human JSON. A data format that caters to humans and helps
+reduce the errors they make.
 
 It supports ``#``, ``//`` and ``/**/`` style comments as well as
 avoiding trailing/missing comma and other mistakes. For details and
-syntax see http://laktak.github.io/hjson.
+syntax see `hjson.org`_.
 
-Hjson works with Python 2.5+ and Python 3.3+ (forked from simplejson)
+Hjson works with Python 2.5+ and Python 3.3+ (based on `simplejson`_)
 
 Installation
 ============
@@ -80,12 +80,20 @@ Use hjson.tool to validate and convert.
 
 ``python -m hjson.tool [FORMAT] [INFILE [OUTFILE]]``
 
-Formats: - ``-h``: print Hjson - ``-j``: print formatted JSON - ``-c``:
-print compact JSON
+Formats:
+
+-  ``-h``: print Hjson
+-  ``-j``: print formatted JSON
+-  ``-c``: print compact JSON
 
 E.g. ``echo '{"json":"obj"}' | python -m hjson.tool``
 
 API
 ===
 
-See the simplejson docs: http://simplejson.readthedocs.org/
+`hjson-py`_
+
+.. _Hjson: http://hjson.org
+.. _hjson.org: http://hjson.org
+.. _simplejson: https://github.com/simplejson/simplejson
+.. _hjson-py: http://laktak.github.io/hjson-py/

@@ -362,7 +362,7 @@ def JSONArray(state, scan_once):
     return values, end
 
 class HjsonDecoder(object):
-    """Hjson <http://laktak.github.io/hjson> decoder
+    """Hjson decoder
 
     Performs the following translations in decoding by default:
 

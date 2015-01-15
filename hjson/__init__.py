@@ -1,12 +1,7 @@
 r"""Hjson, the Human JSON. A configuration file format that caters to
 humans and helps reduce the errors they make.
 
-For details and syntax see http://laktak.github.io/hjson.
-
-:mod:`hjson` exposes an API familiar to users of the standard library
-:mod:`marshal` and :mod:`pickle` modules. It is the externally maintained
-version of the :mod:`json` library contained in Python 2.6, but maintains
-compatibility with Python 2.4 and Python 2.5.
+For details and syntax see <http://hjson.org>.
 
 Decoding Hjson::
 
