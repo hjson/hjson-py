@@ -84,3 +84,11 @@ E.g. `echo '{"json":"obj"}' | python -m hjson.tool`
 # API
 
 [hjson-py](http://laktak.github.io/hjson-py/)
+
+# Changes
+
+- v1.4.1
+  - Added documentation, links.
+
+- v1.4.0
+  - First release.
