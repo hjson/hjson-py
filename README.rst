@@ -20,14 +20,14 @@ Installation
 Usage
 =====
 
-::
+.. code-block:: python
 
     import hjson
 
 Decoding Hjson
 --------------
 
-::
+.. code-block:: python
 
     text = """{
       foo: a
@@ -38,14 +38,14 @@ Decoding Hjson
 
 Result:
 
-::
+.. code-block:: python
 
     OrderedDict([('foo', 'a'), ('bar', 1)])
 
 Encoding Python object hierarchies
 ----------------------------------
 
-::
+.. code-block:: python
 
     hjson.dumps({'foo': 'text', 'bar': (1, 2)})
 
@@ -67,7 +67,7 @@ Encoding as JSON
 
 Note that this is probably not as performant as the simplejson version.
 
-::
+.. code-block:: python
 
     hjson.dumpsJSON(['foo', {'bar': ('baz', None, 1.0, 2)}])
 
@@ -76,7 +76,7 @@ Result: ``'["foo", {"bar": ["baz", null, 1.0, 2]}]'``
 From the Commandline
 --------------------
 
-Use hjson.tool to validate and convert.
+Use ``hjson.tool`` to validate and convert.
 
 ``python -m hjson.tool [FORMAT] [INFILE [OUTFILE]]``
 
