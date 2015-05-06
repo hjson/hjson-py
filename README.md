@@ -2,7 +2,6 @@
 
 [![Build Status](https://img.shields.io/travis/laktak/hjson-py.svg?style=flat-square)](http://travis-ci.org/laktak/hjson-py)
 [![PyPI version](https://img.shields.io/pypi/v/hjson.svg?style=flat-square)](https://pypi.python.org/pypi/hjson)
-[![License](https://img.shields.io/github/license/laktak/hjson-py.svg?style=flat-square)](https://github.com/laktak/hjson-py/blob/master/LICENSE)
 
 [Hjson](http://hjson.org), the Human JSON. A data format that caters to humans and helps reduce the errors they make.
 
@@ -89,6 +88,9 @@ E.g. `echo '{"json":"obj"}' | python -m hjson.tool`
 [hjson-py documentation](http://laktak.github.io/hjson-py/)
 
 # Changes
+
+- v1.5.0
+  - Added support for optional root braces
 
 - v1.4.1
   - Added documentation, links.
