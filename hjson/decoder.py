@@ -26,10 +26,7 @@ NaN, PosInf, NegInf = _floatconstants()
 
 WHITESPACE = ' \t\n\r'
 
-NUMBER_RE = re.compile(
-    r'[\t ]*(-?(?:0|[1-9]\d*))(\.\d+)?([eE][-+]?\d+)?[\t ]*',
-    (re.VERBOSE | re.DOTALL))
-
+NUMBER_RE = re.compile(r'[\t ]*(-?(?:0|[1-9]\d*))(\.\d+)?([eE][-+]?\d+)?[\t ]*')
 STRINGCHUNK = re.compile(r'(.*?)(["\\\x00-\x1f])', FLAGS)
 BACKSLASH = {
     '"': u('"'), '\\': u('\u005c'), '/': u('/'),

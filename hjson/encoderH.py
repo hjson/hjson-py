@@ -33,11 +33,10 @@ NEEDSESCAPENAME = re.compile(r'[,\{\[\}\]\s]')
 NEEDSESCAPE = re.compile(u'[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]')
 NEEDSQUOTES = re.compile(u'[\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]') # like needsEscape but without \\ and \"
 NEEDSESCAPEML = re.compile(u'\'\'\'|[\x00-\x09\x0b\x0c\x0e-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]') # ml or (needsQuotes but without \n and \r)
+
 WHITESPACE = ' \t\n\r'
-KEYWORDS = [ 'true', 'false', 'null' ]
-NUMBER_RE = re.compile(
-    r'[\t ]*(-?(?:0|[1-9]\d*))(\.\d+)?([eE][-+]?\d+)?[\t ]*',
-    (re.VERBOSE | re.DOTALL))
+STARTSWITHNUMBER = re.compile(r'^[\t ]*(-?(?:0|[1-9]\d*))(\.\d+)?([eE][-+]?\d+)?\s*((,|\]|\}|#|\/\/|\/\*).*)?$');
+STARTSWITHKEYWORD = re.compile(r'^(true|false|null)\s*((,|\]|\}|#|\/\/|\/\*).*)?$');
 
 FLOAT_REPR = repr
 
@@ -374,8 +373,7 @@ def _make_iterencode(markers, _default, _encoder, _indent, _floatstr,
         first = str[0]
         isNumber = False
         if first == '-' or first >= '0' and first <= '9':
-            m = NUMBER_RE.match(str)
-            isNumber = m is not None and m.end() == len(str)
+            isNumber = STARTSWITHNUMBER.match(str) is not None
 
         last = str[-1]
         if (NEEDSQUOTES.search(str) or
@@ -387,7 +385,7 @@ def _make_iterencode(markers, _default, _encoder, _indent, _floatstr,
             first == '[' or
             last in WHITESPACE or
             isNumber or
-            str in KEYWORDS):
+            STARTSWITHKEYWORD.match(str) is not None):
 
             # If the string contains no control characters, no quote characters, and no
             # backslash characters, then we can safely slap some quotes around it.
