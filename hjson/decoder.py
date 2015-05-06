@@ -306,21 +306,25 @@ def make_scanner(context):
         return parse_tfnns(context, string, idx)
 
     def scan_once(string, idx):
-        if idx < 0:
-            # Ensure the same behavior as the C speedup, otherwise
-            # this would work for *some* negative string indices due
-            # to the behavior of __getitem__ for strings. #98
-            raise HjsonDecodeError('Expecting value', string, idx)
+        if idx < 0: raise HjsonDecodeError('Expecting value', string, idx)
         try:
             return _scan_once(string, idx)
         finally:
             memo.clear()
 
-    return scan_once
+    def scan_object_once(string, idx):
+        if idx < 0: raise HjsonDecodeError('Expecting value', string, idx)
+        try:
+            return parse_object((string, idx), encoding, strict,
+                _scan_once, object_hook, object_pairs_hook, memo, True)
+        finally:
+            memo.clear()
+
+    return scan_once, scan_object_once
 
 
 def JSONObject(state, encoding, strict, scan_once, object_hook,
-        object_pairs_hook, memo=None):
+        object_pairs_hook, memo=None, objectWithoutBraces=False):
     (s, end) = state
     # Backwards compatibility
     if memo is None:
@@ -331,7 +335,7 @@ def JSONObject(state, encoding, strict, scan_once, object_hook,
     ch, end = getNext(s, end)
 
     # Trivial empty object
-    if ch == '}':
+    if not objectWithoutBraces and ch == '}':
         if object_pairs_hook is not None:
             result = object_pairs_hook(pairs)
             return result, end + 1
@@ -358,9 +362,12 @@ def JSONObject(state, encoding, strict, scan_once, object_hook,
         if ch == ',':
             ch, end = getNext(s, end + 1)
 
-        if ch == '}':
-            end += 1
-            break
+        if objectWithoutBraces:
+            if ch == '': break;
+        else:
+            if ch == '}':
+                end += 1
+                break
 
         ch, end = getNext(s, end)
 
@@ -483,7 +490,7 @@ class HjsonDecoder(object):
         self.parse_mlstring = mlscanstring
         self.parse_tfnns = scantfnns
         self.memo = {}
-        self.scan_once = make_scanner(self)
+        (self.scan_once, self.scan_object_once) = make_scanner(self)
 
     def decode(self, s, _PY3=PY3):
         """Return the Python representation of ``s`` (a ``str`` or ``unicode``
@@ -524,4 +531,24 @@ class HjsonDecoder(object):
                 idx += 3
 
         ch, idx = getNext(s, idx)
-        return self.scan_once(s, idx)
+
+        if ch == '{' or ch == '[':
+            return self.scan_once(s, idx)
+        else:
+            # look if we are dealing with a single JSON value (true/false/null/#/"")
+            # if it is multiline we assume it's a Hjson object without root braces.
+            i = 0
+            c = 0
+            line = 0
+            slen = len(s)
+            while i < slen:
+                c = s[i:i + 1]
+                i += 1
+                if c == '\n':
+                    line = 1
+                    break
+            # if we have multiple lines, assume optional {} (but ignore \n suffix)
+            if line > 0 and (c != '\n' or i < slen):
+                return self.scan_object_once(s, idx)
+            else:
+                return self.scan_once(s, idx)
