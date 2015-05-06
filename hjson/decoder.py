@@ -5,7 +5,7 @@ import re
 import sys
 import struct
 from .compat import fromhex, b, u, text_type, binary_type, PY3, unichr
-from .scanner import make_scanner, HjsonDecodeError
+from .scanner import HjsonDecodeError
 
 # NOTE (3.1.0): HjsonDecodeError may still be imported from this module for
 # compatibility, but it was never in the __all__
@@ -275,6 +275,48 @@ def scanKeyName(s, end, encoding=None, strict=True):
         else:
             end += 1
 
+def make_scanner(context):
+    parse_object = context.parse_object
+    parse_array = context.parse_array
+    parse_string = context.parse_string
+    parse_mlstring = context.parse_mlstring
+    parse_tfnns = context.parse_tfnns
+    encoding = context.encoding
+    strict = context.strict
+    object_hook = context.object_hook
+    object_pairs_hook = context.object_pairs_hook
+    memo = context.memo
+
+    def _scan_once(string, idx):
+        try:
+            ch = string[idx]
+        except IndexError:
+            raise HjsonDecodeError('Expecting value', string, idx)
+
+        if ch == '"':
+            return parse_string(string, idx + 1, encoding, strict)
+        elif ch == '{':
+            return parse_object((string, idx + 1), encoding, strict,
+                _scan_once, object_hook, object_pairs_hook, memo)
+        elif ch == '[':
+            return parse_array((string, idx + 1), _scan_once)
+        elif ch == '\'' and string[idx:idx + 3] == '\'\'\'':
+            return parse_mlstring(string, idx)
+
+        return parse_tfnns(context, string, idx)
+
+    def scan_once(string, idx):
+        if idx < 0:
+            # Ensure the same behavior as the C speedup, otherwise
+            # this would work for *some* negative string indices due
+            # to the behavior of __getitem__ for strings. #98
+            raise HjsonDecodeError('Expecting value', string, idx)
+        try:
+            return _scan_once(string, idx)
+        finally:
+            memo.clear()
+
+    return scan_once
 
 
 def JSONObject(state, encoding, strict, scan_once, object_hook,
@@ -357,6 +399,7 @@ def JSONArray(state, scan_once):
         ch, end = getNext(s, end)
 
     return values, end
+
 
 class HjsonDecoder(object):
     """Hjson decoder
