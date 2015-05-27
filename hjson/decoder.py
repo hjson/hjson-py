@@ -268,10 +268,10 @@ def scanKeyName(s, end, encoding=None, strict=True):
 
         if ch == ':':
             if begin == end:
-                raise HjsonDecodeError("Empty key name requires quotes at", s, begin)
+                raise HjsonDecodeError("Found ':' but no key name (for an empty key name use quotes)", s, begin)
             return s[begin:end], end
         elif ch in WHITESPACE or ch == '{' or ch == '}' or ch == '[' or ch == ']' or ch == ',':
-            raise HjsonDecodeError("Key names that include {}[],: or whitespace require quotes at", s, begin)
+            raise HjsonDecodeError("Found '" + ch + "' where a key name was expected (check your syntax or use quotes if the key name includes {}[],: or whitespace)", s, begin)
         else:
             end += 1
 
@@ -389,7 +389,7 @@ def JSONArray(state, scan_once):
     if ch == ']':
         return values, end + 1
     elif ch == '':
-        raise HjsonDecodeError("Expecting value or ']'", s, end)
+        raise HjsonDecodeError("End of input while parsing an array (did you forget a closing ']'?)", s, end)
     _append = values.append
     while True:
         value, end = scan_once(s, end)
@@ -547,8 +547,8 @@ class HjsonDecoder(object):
                 if c == '\n':
                     line = 1
                     break
-            # if we have multiple lines, assume optional {} (but ignore \n suffix)
-            if line > 0 and (c != '\n' or i < slen):
+            # if we have multiple lines, assume optional {}
+            if line > 0:
                 return self.scan_object_once(s, idx)
             else:
                 return self.scan_once(s, idx)
