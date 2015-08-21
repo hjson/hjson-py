@@ -250,7 +250,7 @@ def scantfnns(context, s, end):
                 return res, end
 
             if isEol:
-                return s[begin:end], end
+                return s[begin:end].strip(), end
 
         end += 1
 
