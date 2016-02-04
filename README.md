@@ -87,13 +87,17 @@ E.g. `echo '{"json":"obj"}' | python -m hjson.tool`
 
 [hjson-py documentation](http://laktak.github.io/hjson-py/)
 
-# Changes
+# History
 
+- v1.5.3
+  - fix trailing whitespace in keyname
+- v1.5.2
+  - fix trailing space in quoteless strings
+- v1.5.1
+  - better error messages & root check
 - v1.5.0
   - Added support for optional root braces
-
 - v1.4.1
   - Added documentation, links.
-
 - v1.4.0
   - First release.
