@@ -49,7 +49,8 @@ class TestAssets(TestCase):
 
 
         except hjson.HjsonDecodeError as e:
-            self.assertTrue(shouldFail)
+            if not shouldFail:
+                self.fail("raised error on parsing %s: %r" % (file, e))
 
     def test_files(self):
         for file in self.assets:

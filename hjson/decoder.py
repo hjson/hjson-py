@@ -263,17 +263,25 @@ def scanKeyName(s, end, encoding=None, strict=True):
         return scanstring(s, end + 1, encoding, strict)
 
     begin = end
+    space = -1
     while 1:
         ch = s[end:end + 1]
 
-        if ch == ':':
+        if ch == '':
+            raise HjsonDecodeError("Bad key name (eof)", s, end);
+        elif ch == ':':
             if begin == end:
                 raise HjsonDecodeError("Found ':' but no key name (for an empty key name use quotes)", s, begin)
-            return s[begin:end], end
-        elif ch in WHITESPACE or ch == '{' or ch == '}' or ch == '[' or ch == ']' or ch == ',':
+            elif space >= 0:
+                if space != end - 1: raise HjsonDecodeError("Found whitespace in your key name (use quotes to include)", s, space)
+                return s[begin:end].rstrip(), end
+            else:
+                return s[begin:end], end
+        elif ch in WHITESPACE:
+            if space < 0 or space == end - 1: space = end
+        elif ch == '{' or ch == '}' or ch == '[' or ch == ']' or ch == ',':
             raise HjsonDecodeError("Found '" + ch + "' where a key name was expected (check your syntax or use quotes if the key name includes {}[],: or whitespace)", s, begin)
-        else:
-            end += 1
+        end += 1
 
 def make_scanner(context):
     parse_object = context.parse_object
