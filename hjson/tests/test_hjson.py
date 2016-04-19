@@ -4,6 +4,7 @@ import os
 import sys
 import subprocess
 import tempfile
+import codecs # dump
 
 from unittest import TestCase
 
@@ -13,6 +14,7 @@ class TestAssets(TestCase):
 
     assetsDir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets")
     assets = os.listdir(assetsDir)
+    assets = [ "passSingle_test.hjson" ]
     maxDiff = None
     verma, vermi = sys.version_info[0:2]
 
@@ -30,7 +32,7 @@ class TestAssets(TestCase):
 
         try:
             data = hjson.loads(text)
-            self.assertFalse(shouldFail)
+            self.assertFalse(shouldFail, file)
 
             text1 = hjson.dumpsJSON(data)
             hjson1 = hjson.dumps(data, ensure_ascii=False);
@@ -38,15 +40,15 @@ class TestAssets(TestCase):
             text2 = hjson.dumpsJSON(result)
             hjson2 = self.load(name + "_result.hjson", False)
 
-            if self.verma>2 or self.vermi>6:
-                # final check fails on py2.6 because of string formatting issues
-                self.assertEqual(text2, text1)
-                self.assertEqual(hjson2, hjson1)
-
             # dbg
             # with open(name + "_dbg1.txt", "w") as tmp: tmp.write(hjson1.encode("utf-8"))
             # with open(name + "_dbg2.txt", "w") as tmp: tmp.write(hjson2.encode("utf-8"))
+            # with codecs.open(name + "_dbg3.txt", 'w', 'utf-8') as tmp: hjson.dump(data, tmp)
 
+            if self.verma>2 or self.vermi>6:
+                # final check fails on py2.6 because of string formatting issues
+                self.assertEqual(text2, text1, file)
+                self.assertEqual(hjson2, hjson1, file)
 
         except hjson.HjsonDecodeError as e:
             if not shouldFail:

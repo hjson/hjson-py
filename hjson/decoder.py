@@ -543,20 +543,14 @@ class HjsonDecoder(object):
         if ch == '{' or ch == '[':
             return self.scan_once(s, idx)
         else:
-            # look if we are dealing with a single JSON value (true/false/null/#/"")
-            # if it is multiline we assume it's a Hjson object without root braces.
-            i = 0
-            c = 0
-            line = 0
-            slen = len(s)
-            while i < slen:
-                c = s[i:i + 1]
-                i += 1
-                if c == '\n':
-                    line = 1
-                    break
-            # if we have multiple lines, assume optional {}
-            if line > 0:
+            # assume we have a root object without braces
+            try:
                 return self.scan_object_once(s, idx)
-            else:
-                return self.scan_once(s, idx)
+            except HjsonDecodeError as e:
+                # test if we are dealing with a single JSON value instead (true/false/null/num/"")
+                try:
+                    return self.scan_once(s, idx)
+                except:
+                    raise e
+
+

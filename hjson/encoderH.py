@@ -233,11 +233,7 @@ class HjsonEncoder(object):
             _encoding = self.encoding
             if (_encoding is not None and not (_encoding == 'utf-8')):
                 o = o.decode(_encoding)
-        if isinstance(o, string_types):
-            if self.ensure_ascii:
-                return encode_basestring_ascii(o)
-            else:
-                return encode_basestring(o)
+
         # This doesn't pass the iterator directly to ''.join() because the
         # exceptions aren't as detailed.  The list call should be roughly
         # equivalent to the PySequence_Fast that ''.join() would do.

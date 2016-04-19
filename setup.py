@@ -10,7 +10,7 @@ from distutils.errors import CCompilerError, DistutilsExecError, \
     DistutilsPlatformError
 
 IS_PYPY = hasattr(sys, 'pypy_translation_info')
-VERSION = '1.5.3'
+VERSION = '1.5.4'
 DESCRIPTION = "JSON for Humans, allows comments and is less error prone."
 
 with open('README.rst', 'r') as f:
