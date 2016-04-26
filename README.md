@@ -3,9 +3,9 @@
 [![Build Status](https://img.shields.io/travis/laktak/hjson-py.svg?style=flat-square)](http://travis-ci.org/laktak/hjson-py)
 [![PyPI version](https://img.shields.io/pypi/v/hjson.svg?style=flat-square)](https://pypi.python.org/pypi/hjson)
 
-[Hjson](http://hjson.org), the Human JSON. A data format that caters to humans and helps reduce the errors they make.
+[Hjson](http://hjson.org), the Human JSON. A configuration file format for humans. Relaxed syntax, fewer mistakes, more comments.
 
-It supports `#`, `//` and `/**/` style comments as well as avoiding trailing/missing comma and other mistakes. For details and syntax see [hjson.org](http://hjson.org).
+![Hjson Intro](http://hjson.org/hjson1.gif)
 
 Hjson works with Python 2.5+ and Python 3.3+
 
