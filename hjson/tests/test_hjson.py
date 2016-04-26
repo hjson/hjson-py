@@ -14,7 +14,6 @@ class TestAssets(TestCase):
 
     assetsDir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets")
     assets = os.listdir(assetsDir)
-    assets = [ "passSingle_test.hjson" ]
     maxDiff = None
     verma, vermi = sys.version_info[0:2]
 

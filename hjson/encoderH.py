@@ -29,7 +29,8 @@ for i in range(0x20):
 for i in [0x2028, 0x2029]:
     ESCAPE_DCT.setdefault(unichr(i), '\\u%04x' % (i,))
 
-NEEDSESCAPENAME = re.compile(r'[,\{\[\}\]\s]')
+NEEDSESCAPENAME = re.compile(r'[,\{\[\}\]\s:#]|\/\/|\/\*')
+
 NEEDSESCAPE = re.compile(u'[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]')
 NEEDSQUOTES = re.compile(u'[\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]') # like needsEscape but without \\ and \"
 NEEDSESCAPEML = re.compile(u'\'\'\'|[\x00-\x09\x0b\x0c\x0e-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]') # ml or (needsQuotes but without \n and \r)
