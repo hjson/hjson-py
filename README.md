@@ -89,6 +89,8 @@ E.g. `echo '{"json":"obj"}' | python -m hjson.tool`
 
 # History
 
+- v1.5.6
+  - fix dump for comment tokens in keyname
 - v1.5.4
   - fix decode/encode single JSON value files
 - v1.5.3
