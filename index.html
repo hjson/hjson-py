@@ -1208,7 +1208,7 @@ Other formats are -c <span class="k">for</span> compact or -j <span class="k">fo
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span>
-<span class="n">__version__</span> <span class="o">=</span> <span class="s">&#39;1.4.0&#39;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s">&#39;1.5.8&#39;</span>
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s">&#39;dump&#39;</span><span class="p">,</span> <span class="s">&#39;dumps&#39;</span><span class="p">,</span> <span class="s">&#39;load&#39;</span><span class="p">,</span> <span class="s">&#39;loads&#39;</span><span class="p">,</span>
     <span class="s">&#39;dumpJSON&#39;</span><span class="p">,</span> <span class="s">&#39;dumpsJSON&#39;</span><span class="p">,</span>
@@ -3013,7 +3013,7 @@ endcolno: The column corresponding to end (may be None)</p></div>
         <span class="bp">self</span><span class="o">.</span><span class="n">parse_mlstring</span> <span class="o">=</span> <span class="n">mlscanstring</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parse_tfnns</span> <span class="o">=</span> <span class="n">scantfnns</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">memo</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">scan_once</span> <span class="o">=</span> <span class="n">make_scanner</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scan_once</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scan_object_once</span><span class="p">)</span> <span class="o">=</span> <span class="n">make_scanner</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">_PY3</span><span class="o">=</span><span class="n">PY3</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return the Python representation of ``s`` (a ``str`` or ``unicode``</span>
@@ -3054,7 +3054,19 @@ endcolno: The column corresponding to end (may be None)</p></div>
                 <span class="n">idx</span> <span class="o">+=</span> <span class="mi">3</span>
 
         <span class="n">ch</span><span class="p">,</span> <span class="n">idx</span> <span class="o">=</span> <span class="n">getNext</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scan_once</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">ch</span> <span class="o">==</span> <span class="s">&#39;{&#39;</span> <span class="ow">or</span> <span class="n">ch</span> <span class="o">==</span> <span class="s">&#39;[&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scan_once</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># assume we have a root object without braces</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scan_object_once</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">HjsonDecodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c"># test if we are dealing with a single JSON value instead (true/false/null/num/&quot;&quot;)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scan_once</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">e</span>
 </pre></div>
 
   </div>
@@ -3157,7 +3169,7 @@ invalid control character in a string. The default setting of
     <span class="bp">self</span><span class="o">.</span><span class="n">parse_mlstring</span> <span class="o">=</span> <span class="n">mlscanstring</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">parse_tfnns</span> <span class="o">=</span> <span class="n">scantfnns</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">memo</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">scan_once</span> <span class="o">=</span> <span class="n">make_scanner</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scan_once</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scan_object_once</span><span class="p">)</span> <span class="o">=</span> <span class="n">make_scanner</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </pre></div>
 
   </div>
@@ -3239,7 +3251,18 @@ have extraneous data at the end.</p></div>
         <span class="k">elif</span> <span class="n">ord0</span> <span class="o">==</span> <span class="mh">0xef</span> <span class="ow">and</span> <span class="n">s</span><span class="p">[</span><span class="n">idx</span><span class="p">:</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;</span><span class="se">\xef\xbb\xbf</span><span class="s">&#39;</span><span class="p">:</span>
             <span class="n">idx</span> <span class="o">+=</span> <span class="mi">3</span>
     <span class="n">ch</span><span class="p">,</span> <span class="n">idx</span> <span class="o">=</span> <span class="n">getNext</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scan_once</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ch</span> <span class="o">==</span> <span class="s">&#39;{&#39;</span> <span class="ow">or</span> <span class="n">ch</span> <span class="o">==</span> <span class="s">&#39;[&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scan_once</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c"># assume we have a root object without braces</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scan_object_once</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">HjsonDecodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c"># test if we are dealing with a single JSON value instead (true/false/null/num/&quot;&quot;)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scan_once</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">e</span>
 </pre></div>
 
   </div>
@@ -3350,16 +3373,6 @@ have extraneous data at the end.</p></div>
             </div>
             <div class="item">
             <p id="hjson.HjsonDecoder.parse_tfnns" class="name">var <span class="ident">parse_tfnns</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-            <div class="item">
-            <p id="hjson.HjsonDecoder.scan_once" class="name">var <span class="ident">scan_once</span></p>
             
 
             
@@ -3560,11 +3573,7 @@ implementation (to raise <code>TypeError</code>).</p></div>
             <span class="n">_encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">_encoding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">_encoding</span> <span class="o">==</span> <span class="s">&#39;utf-8&#39;</span><span class="p">)):</span>
                 <span class="n">o</span> <span class="o">=</span> <span class="n">o</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">_encoding</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensure_ascii</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">encode_basestring_ascii</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">encode_basestring</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+
         <span class="c"># This doesn&#39;t pass the iterator directly to &#39;&#39;.join() because the</span>
         <span class="c"># exceptions aren&#39;t as detailed.  The list call should be roughly</span>
         <span class="c"># equivalent to the PySequence_Fast that &#39;&#39;.join() would do.</span>
@@ -3849,11 +3858,6 @@ HjsonEncoder().encode({"foo": ["bar", "baz"]})
         <span class="n">_encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">_encoding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">_encoding</span> <span class="o">==</span> <span class="s">&#39;utf-8&#39;</span><span class="p">)):</span>
             <span class="n">o</span> <span class="o">=</span> <span class="n">o</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">_encoding</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensure_ascii</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">encode_basestring_ascii</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">encode_basestring</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
     <span class="c"># This doesn&#39;t pass the iterator directly to &#39;&#39;.join() because the</span>
     <span class="c"># exceptions aren&#39;t as detailed.  The list call should be roughly</span>
     <span class="c"># equivalent to the PySequence_Fast that &#39;&#39;.join() would do.</span>
@@ -5229,7 +5233,7 @@ When last=True, acts like a fast version of self[key]=self.pop(key).</p></div>
             
   <div class="item">
     <div class="name def" id="hjson.OrderedDict.pop">
-    <p>def <span class="ident">pop</span>(</p><p>self, key, default=&lt;object object at 0x010D1488&gt;)</p>
+    <p>def <span class="ident">pop</span>(</p><p>self, key, default=&lt;object object at 0x011B1488&gt;)</p>
     </div>
     
 
