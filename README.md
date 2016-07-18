@@ -17,6 +17,24 @@ The Python implementation of Hjson is based on [simplejson](https://github.com/s
 
 - or download from https://pypi.python.org/pypi/hjson
 
+## Commandline
+
+```
+Usage:
+  hjson [options]
+  hjson [options] <input>
+  hjson (-h | --help)
+  hjson (-V | --version)
+
+Options:
+  -h --help     Show this screen.
+  -j            Output as formatted JSON.
+  -c            Output as JSON.
+  -V --version  Show version.
+```
+
+E.g. `echo '{"json":"obj"}' | hjson`
+
 # Usage
 
 ```python
@@ -69,19 +87,6 @@ Result:
 `'["foo", {"bar": ["baz", null, 1.0, 2]}]'`
 
 
-## From the Commandline
-
-Use `hjson.tool` to validate and convert.
-
-`python -m hjson.tool [FORMAT] [INFILE [OUTFILE]]`
-
-Formats:
-
-- `-h`: print Hjson
-- `-j`: print formatted JSON
-- `-c`: print compact JSON
-
-E.g. `echo '{"json":"obj"}' | python -m hjson.tool`
 
 # API
 
@@ -89,19 +94,4 @@ E.g. `echo '{"json":"obj"}' | python -m hjson.tool`
 
 # History
 
-- v1.5.6
-  - fix dump for comment tokens in keyname
-- v1.5.4
-  - fix decode/encode single JSON value files
-- v1.5.3
-  - fix trailing whitespace in keyname
-- v1.5.2
-  - fix trailing space in quoteless strings
-- v1.5.1
-  - better error messages & root check
-- v1.5.0
-  - Added support for optional root braces
-- v1.4.1
-  - Added documentation, links.
-- v1.4.0
-  - First release.
+[see history.md](history.md)

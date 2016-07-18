@@ -13,6 +13,26 @@ Installation
 
 -  or download from https://pypi.python.org/pypi/hjson
 
+Commandline
+-----------
+
+::
+
+    Usage:
+      hjson [options]
+      hjson [options] <input>
+      hjson (-h | --help)
+      hjson (-V | --version)
+
+    Options:
+      -h --help     Show this screen.
+      -j            Output as formatted JSON.
+      -c            Output as JSON.
+      -V --version  Show version.
+
+E.g. ``echo '{"json":"obj"}' | hjson``
+
+
 Usage
 =====
 
@@ -68,21 +88,6 @@ Note that this is probably not as performant as the simplejson version.
     hjson.dumpsJSON(['foo', {'bar': ('baz', None, 1.0, 2)}])
 
 Result: ``'["foo", {"bar": ["baz", null, 1.0, 2]}]'``
-
-From the Commandline
---------------------
-
-Use ``hjson.tool`` to validate and convert.
-
-``python -m hjson.tool [FORMAT] [INFILE [OUTFILE]]``
-
-Formats:
-
--  ``-h``: print Hjson
--  ``-j``: print formatted JSON
--  ``-c``: print compact JSON
-
-E.g. ``echo '{"json":"obj"}' | python -m hjson.tool``
 
 API
 ===

@@ -2,38 +2,63 @@ r"""Command-line tool to validate and pretty-print JSON
 
 Usage::
 
-    $ echo '{"json":"obj"}' | python -m hjson.tool
+    $ echo '{"json":"obj"}' | hjson
     {
         "json": "obj"
     }
-    $ echo '{ 1.2:3.4}' | python -m hjson.tool
-    Expecting property name: line 1 column 2 (char 2)
 
 """
 from __future__ import with_statement
 import sys
 import hjson
+import pkg_resources  # part of setuptools
+
+HELP="""Hjson, the Human JSON.
+
+Usage:
+  hjson [options]
+  hjson [options] <input>
+  hjson (-h | --help)
+  hjson (-V | --version)
+
+Options:
+  -h --help     Show this screen.
+  -j            Output as formatted JSON.
+  -c            Output as JSON.
+  -V --version  Show version.
+""";
+
+def showerr(msg):
+    sys.stderr.write(msg)
+    sys.stderr.write("\n")
 
 def main():
-    todo = "-h"
+    format = 'hjson'
     args = []
     for arg in sys.argv[1:]:
-        if arg[0] == '-':
-            todo = arg
+        if arg == '-h' or arg == '--help':
+            showerr(HELP)
+            return
+        elif arg == '-j': format = 'json'
+        elif arg == '-c': format = 'compact'
+        elif arg == '-V' or arg == '--version':
+            showerr('Hjson ' + pkg_resources.require("Hjson")[0].version)
+            return
+
+        elif arg[0] == '-':
+            showerr(HELP)
+            raise SystemExit('unknown option ' + arg)
         else:
             args.append(arg)
 
+    outfile = sys.stdout
     if len(args) == 0:
         infile = sys.stdin
-        outfile = sys.stdout
     elif len(args) == 1:
         infile = open(args[0], 'r')
-        outfile = sys.stdout
-    elif len(args) == 2:
-        infile = open(args[0], 'r')
-        outfile = open(args[1], 'w')
     else:
-        raise SystemExit(sys.argv[0] + " {-h|-j|-c} [infile [outfile]]")
+        showerr(HELP)
+        raise SystemExit('unknown options')
 
     with infile:
         try:
@@ -42,9 +67,9 @@ def main():
             raise SystemExit(sys.exc_info()[1])
 
     with outfile:
-        if todo == '-j':
-            hjson.dumpJSON(obj, outfile, use_decimal=True, indent="  ")
-        elif todo == '-c':
+        if format == 'json':
+            hjson.dumpJSON(obj, outfile, use_decimal=True, indent='  ')
+        elif format == 'compact':
             hjson.dumpJSON(obj, outfile, use_decimal=True, separators=(',', ':'))
         else:
             hjson.dump(obj, outfile, use_decimal=True)

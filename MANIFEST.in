@@ -1,4 +1,6 @@
 include *.py
 include *.txt
 include *.rst
+include bin/*
 include MANIFEST.in
+prune \#*
