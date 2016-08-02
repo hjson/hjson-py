@@ -123,7 +123,7 @@ class TestFail(TestCase):
             ('{"spam":42,', 'Bad key name (eof)', 11),
             ('"', 'Unterminated string starting at', 0),
             ('"spam', 'Unterminated string starting at', 0),
-            ('[,', "Expecting value", 2),
+            ('[,', "Found a punctuator character", 1),
         ]
         for data, msg, idx in test_cases:
             try:

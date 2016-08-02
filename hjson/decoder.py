@@ -25,6 +25,7 @@ def _floatconstants():
 NaN, PosInf, NegInf = _floatconstants()
 
 WHITESPACE = ' \t\n\r'
+PUNCTUATOR = '{}[],:'
 
 NUMBER_RE = re.compile(r'[\t ]*(-?(?:0|[1-9]\d*))(\.\d+)?([eE][-+]?\d+)?[\t ]*')
 STRINGCHUNK = re.compile(r'(.*?)(["\\\x00-\x1f])', FLAGS)
@@ -217,6 +218,9 @@ def scantfnns(context, s, end):
 
     chf, begin = getNext(s, end)
     end = begin
+
+    if chf in PUNCTUATOR:
+        raise HjsonDecodeError("Found a punctuator character when excpecting a quoteless string (check your syntax)", s, end);
 
     while 1:
         ch = s[end:end + 1]
