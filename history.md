@@ -1,5 +1,7 @@
 # History
 
+- v2.0.1
+  - move to hjson org
 - v2.0.0
   - fix quoteless string starting with punctuator
 - v1.5.8

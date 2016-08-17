@@ -96,4 +96,4 @@ API
 
 .. _Hjson: http://hjson.org
 .. _simplejson: https://github.com/simplejson/simplejson
-.. _hjson-py: http://laktak.github.io/hjson-py/
+.. _hjson-py: http://hjson.github.io/hjson-py/

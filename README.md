@@ -1,6 +1,6 @@
 # hjson-py
 
-[![Build Status](https://img.shields.io/travis/laktak/hjson-py.svg?style=flat-square)](http://travis-ci.org/laktak/hjson-py)
+[![Build Status](https://img.shields.io/travis/hjson/hjson-py.svg?style=flat-square)](http://travis-ci.org/hjson/hjson-py)
 [![PyPI version](https://img.shields.io/pypi/v/hjson.svg?style=flat-square)](https://pypi.python.org/pypi/hjson)
 
 [Hjson](http://hjson.org), the Human JSON. A configuration file format for humans. Relaxed syntax, fewer mistakes, more comments.
@@ -90,7 +90,7 @@ Result:
 
 # API
 
-[hjson-py documentation](http://laktak.github.io/hjson-py/)
+[hjson-py documentation](http://hjson.github.io/hjson-py/)
 
 # History
 

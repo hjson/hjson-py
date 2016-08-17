@@ -10,7 +10,7 @@ from distutils.errors import CCompilerError, DistutilsExecError, \
     DistutilsPlatformError
 
 IS_PYPY = hasattr(sys, 'pypy_translation_info')
-VERSION = '2.0.0'
+VERSION = '2.0.1'
 DESCRIPTION = "JSON for Humans. A configuration file format with relaxed syntax, fewer mistakes and more comments."
 
 with open('README.rst', 'r') as f:
@@ -68,7 +68,7 @@ def run_setup():
         classifiers=CLASSIFIERS,
         author="Christian Zangl",
         author_email="coralllama@gmail.com",
-        url="http://github.com/laktak/hjson-py",
+        url="http://github.com/hjson/hjson-py",
         license="MIT License",
         packages=['hjson', 'hjson.tests'],
         platforms=['any'],
