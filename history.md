@@ -1,5 +1,7 @@
 # History
 
+- v2.0.2
+  - fix err on bad ML string
 - v2.0.1
   - move to hjson org
 - v2.0.0

@@ -188,7 +188,7 @@ def mlscanstring(s, end):
 
     # When parsing multiline string values, we must look for ' characters
     while 1:
-        ch = s[end]
+        ch = s[end:end + 1]
         if ch == '':
             raise HjsonDecodeError("Bad multiline string", s, end);
         elif ch == '\'':
