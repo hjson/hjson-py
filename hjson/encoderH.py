@@ -29,15 +29,17 @@ for i in range(0x20):
 for i in [0x2028, 0x2029]:
     ESCAPE_DCT.setdefault(unichr(i), '\\u%04x' % (i,))
 
-NEEDSESCAPENAME = re.compile(r'[,\{\[\}\]\s:#"]|\/\/|\/\*|'+"'''")
-
+# NEEDSESCAPE tests if the string can be written without escapes
 NEEDSESCAPE = re.compile(u'[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]')
-NEEDSQUOTES = re.compile(u'[\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]') # like needsEscape but without \\ and \"
-NEEDSESCAPEML = re.compile(u'\'\'\'|[\x00-\x09\x0b\x0c\x0e-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]') # ml or (needsQuotes but without \n and \r)
+# NEEDSQUOTES tests if the string can be written as a quoteless string (includes needsEscape but without \\ and \")
+NEEDSQUOTES = re.compile(u'^\s|^"|^\'\'\'|^#|^\/\*|^\/\/|^\{|^\}|^\[|^\]|^:|^,|\s$|[\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]')
+# NEEDSESCAPEML tests if the string can be written as a multiline string (includes needsEscape but without \n, \r, \\ and \")
+NEEDSESCAPEML = re.compile(u'\'\'\'|[\x00-\x09\x0b\x0c\x0e-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]')
 
 WHITESPACE = ' \t\n\r'
 STARTSWITHNUMBER = re.compile(r'^[\t ]*(-?(?:0|[1-9]\d*))(\.\d+)?([eE][-+]?\d+)?\s*((,|\]|\}|#|\/\/|\/\*).*)?$');
 STARTSWITHKEYWORD = re.compile(r'^(true|false|null)\s*((,|\]|\}|#|\/\/|\/\*).*)?$');
+NEEDSESCAPENAME = re.compile(r'[,\{\[\}\]\s:#"]|\/\/|\/\*|'+"'''")
 
 FLOAT_REPR = repr
 
@@ -372,16 +374,7 @@ def _make_iterencode(markers, _default, _encoder, _indent, _floatstr,
         if first == '-' or first >= '0' and first <= '9':
             isNumber = STARTSWITHNUMBER.match(str) is not None
 
-        last = str[-1]
         if (NEEDSQUOTES.search(str) or
-            first in WHITESPACE or
-            first == '"' or
-            first == '\'' and (str[1:2] == '\'' or str[2:3] == '\'') or
-            first == '#' or
-            first == '/' and (str[1:2] == '*' or str[1:2] == '/') or
-            first == '{' or
-            first == '[' or
-            last in WHITESPACE or
             isNumber or
             STARTSWITHKEYWORD.match(str) is not None):
 

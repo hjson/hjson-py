@@ -1,5 +1,7 @@
 # History
 
+- v2.0.5
+  - fix stringify for strings staring with a punctuator char
 - v2.0.2
   - fix err on bad ML string
 - v2.0.1
