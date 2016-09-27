@@ -220,7 +220,7 @@ def scantfnns(context, s, end):
     end = begin
 
     if chf in PUNCTUATOR:
-        raise HjsonDecodeError("Found a punctuator character when excpecting a quoteless string (check your syntax)", s, end);
+        raise HjsonDecodeError("Found a punctuator character when expecting a quoteless string (check your syntax)", s, end);
 
     while 1:
         ch = s[end:end + 1]
