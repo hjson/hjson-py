@@ -533,7 +533,7 @@ class HjsonDecoder(object):
             # would otherwise mask this behavior. #98
             raise HjsonDecodeError('Expecting value', s, idx)
         if _PY3 and not isinstance(s, text_type):
-            raise TypeError("Input string must be text, not bytes")
+            raise TypeError("Input string must be text")
         # strip UTF-8 bom
         if len(s) > idx:
             ord0 = ord(s[idx])
