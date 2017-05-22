@@ -542,7 +542,12 @@ class HjsonDecoder(object):
             elif ord0 == 0xef and s[idx:idx + 3] == '\xef\xbb\xbf':
                 idx += 3
 
+        start_index = idx
         ch, idx = getNext(s, idx)
+
+        # If blank or comment only file, return dict
+        if start_index == 0 and ch == '':
+            return {}, 0
 
         if ch == '{' or ch == '[':
             return self.scan_once(s, idx)
@@ -556,5 +561,3 @@ class HjsonDecoder(object):
                     return self.scan_once(s, idx)
                 except:
                     raise e
-
-
