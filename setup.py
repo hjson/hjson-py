@@ -10,8 +10,8 @@ from distutils.errors import CCompilerError, DistutilsExecError, \
     DistutilsPlatformError
 
 IS_PYPY = hasattr(sys, 'pypy_translation_info')
-VERSION = '2.0.6'
-DESCRIPTION = "JSON for Humans. A configuration file format with relaxed syntax, fewer mistakes and more comments."
+VERSION = '2.0.7'
+DESCRIPTION = "Hjson, a user interface for JSON."
 
 with open('README.rst', 'r') as f:
    LONG_DESCRIPTION = f.read()

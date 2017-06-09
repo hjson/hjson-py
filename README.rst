@@ -1,8 +1,7 @@
 hjson-py
 ========
 
-`Hjson`_, the Human JSON. A configuration file format for humans.
-Relaxed syntax, fewer mistakes, more comments.
+`Hjson`_, a user interface for JSON
 
 Hjson works with Python 2.5+ and Python 3.3+ (based on `simplejson`_)
 

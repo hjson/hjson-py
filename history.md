@@ -1,5 +1,7 @@
 # History
 
+- v2.0.7
+  - multiline strings allow tabs
 - v2.0.6
   - add support for blank and comment only files
 - v2.0.5

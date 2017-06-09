@@ -12,10 +12,12 @@ import hjson
 
 class TestAssets(TestCase):
 
-    assetsDir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets")
-    assets = os.listdir(assetsDir)
-    maxDiff = None
-    verma, vermi = sys.version_info[0:2]
+    def __init__(self, *args, **kwargs):
+        super(TestAssets, self).__init__(*args, **kwargs)
+        self.assetsDir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets")
+        self.assets = self.load('testlist.txt', False).split('\n')
+        self.maxDiff = None
+        self.verma, self.vermi = sys.version_info[0:2]
 
     def load(self, name, cr):
         name = os.path.join(self.assetsDir, name)
@@ -56,7 +58,8 @@ class TestAssets(TestCase):
     def test_files(self):
         for file in self.assets:
             name, sep, ext = file.partition("_test.")
-            if not sep: continue
+            if name.startswith("stringify/quotes") or \
+                name.startswith("extra/"): continue # ignore/not supported
 
             self.check(name, file, True)
             self.check(name, file, False)

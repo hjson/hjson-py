@@ -13,7 +13,7 @@ import sys
 import hjson
 import pkg_resources  # part of setuptools
 
-HELP="""Hjson, the Human JSON.
+HELP="""Hjson, a user interface for JSON
 
 Usage:
   hjson [options]

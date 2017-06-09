@@ -3,7 +3,7 @@
 [![Build Status](https://img.shields.io/travis/hjson/hjson-py.svg?style=flat-square)](http://travis-ci.org/hjson/hjson-py)
 [![PyPI version](https://img.shields.io/pypi/v/hjson.svg?style=flat-square)](https://pypi.python.org/pypi/hjson)
 
-[Hjson](http://hjson.org), the Human JSON. A configuration file format for humans. Relaxed syntax, fewer mistakes, more comments.
+[Hjson](http://hjson.org), a user interface for JSON
 
 ![Hjson Intro](http://hjson.org/hjson1.gif)
 
