@@ -32,23 +32,23 @@ class TestTool(unittest.TestCase):
 
     expect = textwrap.dedent("""\
     [
-        [
-            "blorpie"
-        ],
-        [
-            "whoops"
-        ],
-        [],
-        "d-shtaeou",
-        "d-nthiouh",
-        "i-vhbjkhnth",
-        {
-            "nifty": 87
-        },
-        {
-            "field": "yes",
-            "morefield": false
-        }
+      [
+        blorpie
+      ]
+      [
+        whoops
+      ]
+      []
+      d-shtaeou
+      d-nthiouh
+      i-vhbjkhnth
+      {
+        nifty: 87
+      }
+      {
+        morefield: false
+        field: yes
+      }
     ]
     """)
 
@@ -78,7 +78,8 @@ class TestTool(unittest.TestCase):
                 self.runTool(args=[infile.name]),
                 self.expect.encode())
 
-    def test_infile_outfile(self):
+    def x_test_infile_outfile(self):
+        """Not currently an option in tool"""
         with tempfile.NamedTemporaryFile() as infile:
             infile.write(self.data.encode())
             infile.flush()

@@ -106,7 +106,6 @@ class TestFail(TestCase):
 
     def test_truncated_input(self):
         test_cases = [
-            ('', 'Bad key name (eof)', 0),
             ('[', "End of input while parsing an array", 1),
             # ('[42', "Expecting ',' delimiter", 3),
             ('[42,', 'Expecting value', 4),
