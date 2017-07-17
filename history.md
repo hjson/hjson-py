@@ -1,5 +1,7 @@
 # History
 
+- v3.0.0
+  - add support for single quoted strings
 - v2.0.7
   - multiline strings allow tabs
 - v2.0.6
