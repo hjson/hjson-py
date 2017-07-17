@@ -111,32 +111,11 @@ class TestScanString(TestCase):
                 ValueError,
                 scanstring, c + '"', 0, None, True)
 
-        self.assertRaises(ValueError, scanstring, '', 0, None, True)
-        self.assertRaises(ValueError, scanstring, 'a', 0, None, True)
-        self.assertRaises(ValueError, scanstring, '\\', 0, None, True)
-        self.assertRaises(ValueError, scanstring, '\\u', 0, None, True)
-        self.assertRaises(ValueError, scanstring, '\\u0', 0, None, True)
-        self.assertRaises(ValueError, scanstring, '\\u01', 0, None, True)
-        self.assertRaises(ValueError, scanstring, '\\u012', 0, None, True)
-        self.assertRaises(ValueError, scanstring, '\\u0123', 0, None, True)
-        if sys.maxunicode > 65535:
-            self.assertRaises(ValueError,
-                              scanstring, '\\ud834\\u"', 0, None, True)
-            self.assertRaises(ValueError,
-                              scanstring, '\\ud834\\x0123"', 0, None, True)
-
     def test_issue3623(self):
         self.assertRaises(ValueError, json.decoder.scanstring, "xxx", 1,
                           "xxx")
         self.assertRaises(UnicodeDecodeError,
                           json.encoder.encode_basestring_ascii, b("xx\xff"))
-
-    def test_overflow(self):
-        # Python 2.5 does not have maxsize, Python 3 does not have maxint
-        maxsize = getattr(sys, 'maxsize', getattr(sys, 'maxint', None))
-        assert maxsize is not None
-        self.assertRaises(OverflowError, json.decoder.scanstring, "xxx",
-                          maxsize + 1)
 
     def test_surrogates(self):
         scanstring = json.decoder.scanstring

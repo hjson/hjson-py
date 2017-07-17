@@ -52,7 +52,7 @@ JSONDOCS = [
     # http://json.org/JSON_checker/test/fail23.json
     '["Bad value", truth]',
     # http://json.org/JSON_checker/test/fail24.json
-    "['single quote']",
+    #"['single quote']",
     # http://json.org/JSON_checker/test/fail25.json
     '["\ttab\tcharacter\tin\tstring\t"]',
     # http://json.org/JSON_checker/test/fail26.json

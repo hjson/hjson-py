@@ -28,9 +28,9 @@ WHITESPACE = ' \t\n\r'
 PUNCTUATOR = '{}[],:'
 
 NUMBER_RE = re.compile(r'[\t ]*(-?(?:0|[1-9]\d*))(\.\d+)?([eE][-+]?\d+)?[\t ]*')
-STRINGCHUNK = re.compile(r'(.*?)(["\\\x00-\x1f])', FLAGS)
+STRINGCHUNK = re.compile(r'(.*?)([\'"\\\x00-\x1f])', FLAGS)
 BACKSLASH = {
-    '"': u('"'), '\\': u('\u005c'), '/': u('/'),
+    '"': u('"'), '\'': u('\''), '\\': u('\u005c'), '/': u('/'),
     'b': u('\b'), 'f': u('\f'), 'n': u('\n'), 'r': u('\r'), 't': u('\t'),
 }
 
@@ -97,6 +97,8 @@ def scanstring(s, end, encoding=None, strict=True,
     chunks = []
     _append = chunks.append
     begin = end - 1
+    # callers make sure that string starts with " or '
+    exitCh = s[begin]
     while 1:
         chunk = _m(s, end)
         if chunk is None:
@@ -111,8 +113,11 @@ def scanstring(s, end, encoding=None, strict=True,
             _append(content)
         # Terminator is the end of string, a literal control character,
         # or a backslash denoting that an escape sequence follows
-        if terminator == '"':
+        if terminator == exitCh:
             break
+        elif terminator == '"' or terminator == '\'':
+            _append(terminator)
+            continue
         elif terminator != '\\':
             if strict:
                 msg = "Invalid control character %r at"
@@ -263,7 +268,7 @@ def scanKeyName(s, end, encoding=None, strict=True):
 
     ch, end = getNext(s, end)
 
-    if ch == '"':
+    if ch == '"' or ch == '\'':
         return scanstring(s, end + 1, encoding, strict)
 
     begin = end
@@ -305,15 +310,16 @@ def make_scanner(context):
         except IndexError:
             raise HjsonDecodeError('Expecting value', string, idx)
 
-        if ch == '"':
-            return parse_string(string, idx + 1, encoding, strict)
+        if ch == '"' or ch == '\'':
+            if string[idx:idx + 3] == '\'\'\'':
+                return parse_mlstring(string, idx)
+            else:
+                return parse_string(string, idx + 1, encoding, strict)
         elif ch == '{':
             return parse_object((string, idx + 1), encoding, strict,
                 _scan_once, object_hook, object_pairs_hook, memo)
         elif ch == '[':
             return parse_array((string, idx + 1), _scan_once)
-        elif ch == '\'' and string[idx:idx + 3] == '\'\'\'':
-            return parse_mlstring(string, idx)
 
         return parse_tfnns(context, string, idx)
 

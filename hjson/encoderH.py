@@ -33,14 +33,14 @@ COMMONRANGE=u'\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-
 # NEEDSESCAPE tests if the string can be written without escapes
 NEEDSESCAPE = re.compile(u'[\\\"\x00-\x1f'+COMMONRANGE+']')
 # NEEDSQUOTES tests if the string can be written as a quoteless string (like needsEscape but without \\ and \")
-NEEDSQUOTES = re.compile(u'^\s|^"|^\'\'\'|^#|^\/\*|^\/\/|^\{|^\}|^\[|^\]|^:|^,|\s$|[\x00-\x1f'+COMMONRANGE+u']')
+NEEDSQUOTES = re.compile(u'^\\s|^"|^\'|^#|^\\/\\*|^\\/\\/|^\\{|^\\}|^\\[|^\\]|^:|^,|\\s$|[\x00-\x1f'+COMMONRANGE+u']')
 # NEEDSESCAPEML tests if the string can be written as a multiline string (like needsEscape but without \n, \r, \\, \", \t)
-NEEDSESCAPEML = re.compile(u'\'\'\'|^[\s]+$|[\x00-\x08\x0b\x0c\x0e-\x1f'+COMMONRANGE+u']')
+NEEDSESCAPEML = re.compile(u'\'\'\'|^[\\s]+$|[\x00-\x08\x0b\x0c\x0e-\x1f'+COMMONRANGE+u']')
 
 WHITESPACE = ' \t\n\r'
 STARTSWITHNUMBER = re.compile(r'^[\t ]*(-?(?:0|[1-9]\d*))(\.\d+)?([eE][-+]?\d+)?\s*((,|\]|\}|#|\/\/|\/\*).*)?$');
 STARTSWITHKEYWORD = re.compile(r'^(true|false|null)\s*((,|\]|\}|#|\/\/|\/\*).*)?$');
-NEEDSESCAPENAME = re.compile(r'[,\{\[\}\]\s:#"]|\/\/|\/\*|'+"'''")
+NEEDSESCAPENAME = re.compile(r'[,\{\[\}\]\s:#"\']|\/\/|\/\*|'+"'''")
 
 FLOAT_REPR = repr
 
