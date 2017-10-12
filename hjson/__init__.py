@@ -426,7 +426,7 @@ _default_json_encoder = JSONEncoder(
     int_as_string_bitcount=None,
 )
 
-def dumpJSON(obj, fp, skipkeys=False, ensure_ascii=True, check_circular=True,
+def dumpJSON(obj, fp, skipkeys=False, ensure_ascii=False, check_circular=True,
          cls=None, indent=None, separators=None,
          encoding='utf-8', default=None, use_decimal=True,
          namedtuple_as_object=True, tuple_as_array=True,
