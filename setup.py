@@ -67,7 +67,7 @@ def run_setup():
         keywords="json comments configuration",
         classifiers=CLASSIFIERS,
         author="Christian Zangl",
-        author_email="coralllama@gmail.com",
+        author_email="laktak@cdak.net",
         url="http://github.com/hjson/hjson-py",
         license="MIT License",
         packages=['hjson', 'hjson.tests'],

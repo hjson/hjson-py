@@ -68,11 +68,11 @@ def main():
 
     with outfile:
         if format == 'json':
-            hjson.dumpJSON(obj, outfile, use_decimal=True, indent='  ')
+            hjson.dumpJSON(obj, outfile, ensure_ascii=False, use_decimal=True, indent='  ')
         elif format == 'compact':
-            hjson.dumpJSON(obj, outfile, use_decimal=True, separators=(',', ':'))
+            hjson.dumpJSON(obj, outfile, ensure_ascii=False, use_decimal=True, separators=(',', ':'))
         else:
-            hjson.dump(obj, outfile, use_decimal=True)
+            hjson.dump(obj, outfile, ensure_ascii=False, use_decimal=True)
 
         outfile.write('\n')
 
