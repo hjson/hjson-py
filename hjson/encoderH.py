@@ -10,7 +10,7 @@ from hjson.decoder import PosInf
 
 # This is required because u() will mangle the string and ur'' isn't valid
 # python3 syntax
-ESCAPE = re.compile(u'[\\x00-\\x1f\\\\"\\b\\f\\n\\r\\t\u2028\u2029]')
+ESCAPE = re.compile(u'[\\x00-\\x1f\\\\"\\b\\f\\n\\r\\t\u2028\u2029\uffff]')
 ESCAPE_ASCII = re.compile(r'([\\"]|[^\ -~])')
 HAS_UTF8 = re.compile(r'[\x80-\xff]')
 ESCAPE_DCT = {
@@ -25,7 +25,7 @@ ESCAPE_DCT = {
 for i in range(0x20):
     #ESCAPE_DCT.setdefault(chr(i), '\\u{0:04x}'.format(i))
     ESCAPE_DCT.setdefault(chr(i), '\\u%04x' % (i,))
-for i in [0x2028, 0x2029]:
+for i in [0x2028, 0x2029, 0xffff]:
     ESCAPE_DCT.setdefault(unichr(i), '\\u%04x' % (i,))
 
 COMMONRANGE=u'\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff'
