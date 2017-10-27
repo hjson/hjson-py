@@ -1,5 +1,7 @@
 # History
 
+- v3.0.1
+  - change hjson (cli tool) to use unicode
 - v3.0.0
   - add support for single quoted strings
 - v2.0.7

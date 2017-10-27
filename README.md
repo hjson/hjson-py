@@ -17,6 +17,8 @@ The Python implementation of Hjson is based on [simplejson](https://github.com/s
 
 - or download from https://pypi.python.org/pypi/hjson
 
+pip will also add the `hjson` tool to your `PATH` (try `echo '{a:1}'|hjson`).
+
 ## Commandline
 
 ```
