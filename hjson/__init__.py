@@ -227,12 +227,9 @@ def dump(obj, fp, skipkeys=False, ensure_ascii=True, check_circular=True,
     for container types will be skipped and a circular reference will
     result in an ``OverflowError`` (or worse).
 
-    If *indent* is a string, then JSON array elements and object members
-    will be pretty-printed with a newline followed by that string repeated
-    for each level of nesting. ``None`` (the default) selects the most compact
-    representation without any newlines. For backwards compatibility with
-    versions of hjson earlier than 2.1.0, an integer is also accepted
-    and is converted to a string with that many spaces.
+    *indent* defines the amount of whitespace that the JSON array elements
+    and object members will be indented for each level of nesting.
+    The default is two spaces.
 
     *encoding* is the character encoding for str instances, default is UTF-8.
 
@@ -330,12 +327,9 @@ def dumps(obj, skipkeys=False, ensure_ascii=True, check_circular=True,
     for container types will be skipped and a circular reference will
     result in an ``OverflowError`` (or worse).
 
-    If ``indent`` is a string, then JSON array elements and object members
-    will be pretty-printed with a newline followed by that string repeated
-    for each level of nesting. ``None`` (the default) selects the most compact
-    representation without any newlines. For backwards compatibility with
-    versions of hjson earlier than 2.1.0, an integer is also accepted
-    and is converted to a string with that many spaces.
+    *indent* defines the amount of whitespace that the JSON array elements
+    and object members will be indented for each level of nesting.
+    The default is two spaces.
 
     ``encoding`` is the character encoding for str instances, default is UTF-8.
 
