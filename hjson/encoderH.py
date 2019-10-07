@@ -5,8 +5,7 @@ import re
 from operator import itemgetter
 from decimal import Decimal
 from .compat import u, unichr, binary_type, string_types, integer_types, PY3
-
-from hjson.decoder import PosInf
+from .decoder import PosInf
 
 # This is required because u() will mangle the string and ur'' isn't valid
 # python3 syntax

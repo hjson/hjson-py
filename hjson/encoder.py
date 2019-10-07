@@ -5,8 +5,7 @@ import re
 from operator import itemgetter
 from decimal import Decimal
 from .compat import u, unichr, binary_type, string_types, integer_types, PY3
-
-from hjson.decoder import PosInf
+from .decoder import PosInf
 
 #ESCAPE = re.compile(ur'[\x00-\x1f\\"\b\f\n\r\t\u2028\u2029]')
 # This is required because u() will mangle the string and ur'' isn't valid
