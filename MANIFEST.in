@@ -2,5 +2,7 @@ include *.py
 include *.txt
 include *.rst
 include bin/*
-include MANIFEST.in
+recursive-include hjson *.hjson
+recursive-include hjson *.json
+recursive-include hjson *.txt
 prune \#*
