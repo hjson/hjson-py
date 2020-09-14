@@ -10,7 +10,7 @@ from distutils.errors import CCompilerError, DistutilsExecError, \
     DistutilsPlatformError
 
 IS_PYPY = hasattr(sys, 'pypy_translation_info')
-VERSION = '3.0.1'
+VERSION = '3.0.2'
 DESCRIPTION = "Hjson, a user interface for JSON."
 
 with open('README.rst', 'r') as f:

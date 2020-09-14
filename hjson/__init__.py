@@ -36,7 +36,7 @@ Using hjson.tool from the shell to validate and pretty-print::
 
 """
 from __future__ import absolute_import
-__version__ = '3.0.1'
+__version__ = '3.0.2'
 __all__ = [
     'dump', 'dumps', 'load', 'loads',
     'dumpJSON', 'dumpsJSON',
