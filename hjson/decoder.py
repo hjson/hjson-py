@@ -200,7 +200,7 @@ def mlscanstring(s, end):
             triple += 1
             end += 1
             if triple == 3:
-                if string[-1] == '\n':
+                if string and string[-1] == '\n':
                     string = string[:-1] # remove last EOL
                 return string, end
             else:
