@@ -1,7 +1,7 @@
 r"""Hjson, the Human JSON. A configuration file format that caters to
 humans and helps reduce the errors they make.
 
-For details and syntax see <http://hjson.org>.
+For details and syntax see <https://hjson.github.io>.
 
 Decoding Hjson::
 

@@ -93,6 +93,6 @@ API
 
 `hjson-py`_
 
-.. _Hjson: http://hjson.org
+.. _Hjson: https://hjson.github.io
 .. _simplejson: https://github.com/simplejson/simplejson
 .. _hjson-py: http://hjson.github.io/hjson-py/
