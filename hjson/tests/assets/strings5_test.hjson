@@ -1,0 +1,8 @@
+{
+  # escaped \n should not cause line continuations when using multiline strings
+  key:
+    '''
+    Look, Mom! \
+    No \\n's!
+    '''
+}

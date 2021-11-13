@@ -59,8 +59,6 @@ JSONDOCS = [
     '["tab\\   character\\   in\\  string\\  "]',
     # http://json.org/JSON_checker/test/fail27.json
     '["line\nbreak"]',
-    # http://json.org/JSON_checker/test/fail28.json
-    '["line\\\nbreak"]',
     # http://json.org/JSON_checker/test/fail29.json
     '[0e]',
     # http://json.org/JSON_checker/test/fail30.json

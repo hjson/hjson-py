@@ -131,14 +131,7 @@ def scanstring(s, end, encoding=None, strict=True,
             raise HjsonDecodeError(
                 "Unterminated string starting at", s, begin)
         # If not a unicode escape sequence, must be in the lookup table
-        if esc != 'u':
-            try:
-                char = _b[esc]
-            except KeyError:
-                msg = "Invalid \\X escape sequence %r"
-                raise HjsonDecodeError(msg, s, end)
-            end += 1
-        else:
+        if esc == 'u':
             # Unicode escape sequence
             msg = "Invalid \\uXXXX escape sequence"
             esc = s[end + 1:end + 5]
@@ -168,6 +161,21 @@ def scanstring(s, end, encoding=None, strict=True,
                                          (uni2 - 0xdc00))
                         end += 6
             char = unichr(uni)
+        elif esc == '\n':
+            # Escaped line feed is ignored (line continuation is allowed).
+            end += 1
+            continue
+        elif esc == '\r' and s[end + 1] == '\n':
+            # Escaped line feed is ignored (line continuation is allowed).
+            end += 2
+            continue
+        else:
+            try:
+                char = _b[esc]
+            except KeyError:
+                msg = "Invalid \\X escape sequence %r"
+                raise HjsonDecodeError(msg, s, end)
+            end += 1
         # Append the unescaped character
         _append(char)
     return _join(chunks), end
