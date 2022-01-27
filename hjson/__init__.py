@@ -640,3 +640,122 @@ def simple_first(kv):
     elements to the top, then container elements.
     """
     return (isinstance(kv[1], (list, dict, tuple)), kv[0])
+
+
+def loadWithComments(fp: TextIO, **kwargs) -> Tuple[Dict[str, Any], List[Tuple[str, str, str, int]]]:
+    jsonString = fp.read()
+    fp.close()
+    loadsWithComments(jsonString)    
+
+
+def loadsWithComments(jsonString: str, **kwargs) -> Tuple[Dict[str, Any], List[Tuple[str, str, str, int]]]:
+    jsonObject = hjson.loads(jsonString, kwargs)
+
+    commentPositions = []
+    comments = re.findall(r"(\s+//.*)|(\s+#.*)|(\s+/\*[^*]*\*+(?:[^/*][^*]*\*+)*/)", jsonString)
+    for found in comments:
+        for comment in found:
+            if comment != '':
+                prevLine = ''
+                nextLine = ''
+                commentIndex = jsonString.find(comment)
+                commentEndIndex = commentIndex + len(comment)
+
+                prevNewLineIndex = jsonString.rfind('\n', 0, commentIndex + 1)
+                prevNewLineIndex = 0 if prevNewLineIndex == -1 else prevNewLineIndex
+                prevPrevNewLineIndex = jsonString.rfind('\n', 0, prevNewLineIndex)
+                prevPrevNewLineIndex = 0 if prevPrevNewLineIndex == -1 else prevPrevNewLineIndex
+                if prevNewLineIndex == 0 and prevPrevNewLineIndex == 0:
+                    prevLine = '{'
+                else:
+                    prevLine = jsonString[prevPrevNewLineIndex:prevNewLineIndex]
+                    prevLine = prevLine.replace('\n', '')
+
+                nextNewLineIndex = jsonString.find('\n', commentEndIndex)
+                nextNewLineIndex = len(jsonString) if nextNewLineIndex == -1 else nextNewLineIndex
+                nextNextNewLineIndex = jsonString.find('\n', nextNewLineIndex + 1)
+                nextNextNewLineIndex = len(jsonString) if nextNextNewLineIndex == -1 else nextNextNewLineIndex
+                if nextNewLineIndex == len(jsonString) and nextNextNewLineIndex == len(jsonString):
+                    nextLine = '}'
+                else:
+                    nextLine = jsonString[nextNewLineIndex:nextNextNewLineIndex]
+                    nextLine = nextLine.replace('\n', '')
+
+                commentPositions.append((comment[1:], prevLine, nextLine, commentIndex))
+            if comment != '':
+                prevLine = ''
+                nextLine = ''
+                commentIndex = jsonString.find(comment)
+                commentEndIndex = commentIndex + len(comment)
+
+                prevNewLineIndex = jsonString.rfind('\n', 0, commentIndex + 1)
+                prevNewLineIndex = 0 if prevNewLineIndex == -1 else prevNewLineIndex
+                prevPrevNewLineIndex = jsonString.rfind('\n', 0, prevNewLineIndex)
+                prevPrevNewLineIndex = 0 if prevPrevNewLineIndex == -1 else prevPrevNewLineIndex
+                if prevNewLineIndex == 0 and prevPrevNewLineIndex == 0:
+                    prevLine = '{'
+                else:
+                    prevLine = jsonString[prevPrevNewLineIndex:prevNewLineIndex]
+                    prevLine = prevLine.replace('\n', '')
+
+                nextNewLineIndex = jsonString.find('\n', commentEndIndex)
+                nextNewLineIndex = len(jsonString) if nextNewLineIndex == -1 else nextNewLineIndex
+                nextNextNewLineIndex = jsonString.find('\n', nextNewLineIndex + 1)
+                nextNextNewLineIndex = len(jsonString) if nextNextNewLineIndex == -1 else nextNextNewLineIndex
+                if nextNewLineIndex == len(jsonString) and nextNextNewLineIndex == len(jsonString):
+                    nextLine = '}'
+                else:
+                    nextLine = jsonString[nextNewLineIndex:nextNextNewLineIndex]
+                    nextLine = nextLine.replace('\n', '')
+
+                commentPositions.append((comment[1:], prevLine, nextLine, commentIndex))
+
+    return jsonObject, commentPositions
+
+
+def dumpsWithComments(dictObj: Dict[str, Any], commentPositions: List[Tuple[str, str, str, int]], **kwargs) -> str:
+    hjsonString = hjson.dumps(dictObj, kwargs, indent='    ')
+    prevPrevLineIndex = 0
+    prevNextLineIndex = 0
+    for comments in commentPositions:
+        comment = comments[0]
+        prevLine = comments[1]
+        commentIndex = comments[3]
+        if ':' in prevLine:
+            prevLine = prevLine[:prevLine.find(':') + 1]
+        nextLine = comments[2]
+        if ':' in nextLine:
+            nextLine = nextLine[:nextLine.find(':') + 1]
+        # Find where previous line begins
+        prevLineIndex = hjsonString.rfind(prevLine, prevPrevLineIndex, commentIndex)
+        # Find next \n char after previous line beginning
+        newlineCharAfterPrevLineIndex = hjsonString.find('\n', prevLineIndex)
+        nextLineIndex = hjsonString.find(nextLine, prevNextLineIndex)
+        hjsonString = hjsonString[:newlineCharAfterPrevLineIndex + 1] + comment + '\n' + hjsonString[nextLineIndex:]
+        prevPrevLineIndex = prevLineIndex
+        prevNextLineIndex = nextLineIndex
+    return hjsonString
+
+
+def dumpsJSONWithComments(dictObj: Dict[str, Any], commentPositions: List[Tuple[str, str, str, int]], **kwargs) -> str:
+    hjsonString = hjson.dumpsJSON(dictObj, kwargs, indent='    ')
+    prevPrevLineIndex = 0
+    prevNextLineIndex = 0
+    for comments in commentPositions:
+        comment = comments[0]
+        prevLine = comments[1]
+        commentIndex = comments[3]
+        if ':' in prevLine:
+            prevLine = prevLine[:prevLine.find(':') + 1]
+        nextLine = comments[2]
+        if ':' in nextLine:
+            nextLine = nextLine[:nextLine.find(':') + 1]
+        # Find where previous line begins
+        prevLineIndex = hjsonString.rfind(prevLine, prevPrevLineIndex, commentIndex)
+        # Find next \n char after previous line beginning
+        newlineCharAfterPrevLineIndex = hjsonString.find('\n', prevLineIndex)
+        nextLineIndex = hjsonString.find(nextLine, prevNextLineIndex)
+        hjsonString = hjsonString[:newlineCharAfterPrevLineIndex + 1] + comment + '\n' + hjsonString[nextLineIndex:]
+        prevPrevLineIndex = prevLineIndex
+        prevNextLineIndex = nextLineIndex
+    return hjsonString
