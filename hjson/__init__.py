@@ -49,6 +49,7 @@ __all__ = [
 __author__ = 'Christian Zangl <coralllama@gmail.com>'
 
 from decimal import Decimal
+import re
 
 from .scanner import HjsonDecodeError
 from .decoder import HjsonDecoder
@@ -642,14 +643,32 @@ def simple_first(kv):
     return (isinstance(kv[1], (list, dict, tuple)), kv[0])
 
 
-def loadWithComments(fp: TextIO, **kwargs) -> Tuple[Dict[str, Any], List[Tuple[str, str, str, int]]]:
+def loadWithComments(fp, encoding=None, cls=None, object_hook=None, parse_float=None, parse_int=None,
+                     object_pairs_hook=None, use_decimal=False, **kw):
+    """
+    returns Tuple[Dict[str, Any], List[Tuple[str, str, str, int]]]
+            A tuple containing the  comment,
+                                    the previous line's text,
+                                    the next line's text,
+                                    the string index of the comment
+    """
     jsonString = fp.read()
-    fp.close()
-    loadsWithComments(jsonString)    
+    return loadsWithComments(jsonString, encoding=encoding, cls=cls, object_hook=object_hook, parse_float=parse_float,
+                             parse_int=parse_int, object_pairs_hook=object_pairs_hook, use_decimal=use_decimal, **kw)
 
 
-def loadsWithComments(jsonString: str, **kwargs) -> Tuple[Dict[str, Any], List[Tuple[str, str, str, int]]]:
-    jsonObject = hjson.loads(jsonString, kwargs)
+def loadsWithComments(jsonString, encoding=None, cls=None, object_hook=None, parse_float=None,
+                      parse_int=None, object_pairs_hook=None, use_decimal=False, **kw):
+    """
+    returns Tuple[Dict[str, Any], List[Tuple[str, str, str, int]]]
+            A tuple containing the  comment,
+                                    the previous line's text,
+                                    the next line's text,
+                                    the string index of the comment
+    """
+
+    jsonObject = loads(jsonString, encoding=encoding, cls=cls, object_hook=object_hook, parse_float=parse_float,
+                       parse_int=parse_int, object_pairs_hook=object_pairs_hook, use_decimal=use_decimal, **kw)
 
     commentPositions = []
     comments = re.findall(r"(\s+//.*)|(\s+#.*)|(\s+/\*[^*]*\*+(?:[^/*][^*]*\*+)*/)", jsonString)
@@ -713,32 +732,29 @@ def loadsWithComments(jsonString: str, **kwargs) -> Tuple[Dict[str, Any], List[T
     return jsonObject, commentPositions
 
 
-def dumpsWithComments(dictObj: Dict[str, Any], commentPositions: List[Tuple[str, str, str, int]], **kwargs) -> str:
-    hjsonString = hjson.dumps(dictObj, kwargs, indent='    ')
-    prevPrevLineIndex = 0
-    prevNextLineIndex = 0
-    for comments in commentPositions:
-        comment = comments[0]
-        prevLine = comments[1]
-        commentIndex = comments[3]
-        if ':' in prevLine:
-            prevLine = prevLine[:prevLine.find(':') + 1]
-        nextLine = comments[2]
-        if ':' in nextLine:
-            nextLine = nextLine[:nextLine.find(':') + 1]
-        # Find where previous line begins
-        prevLineIndex = hjsonString.rfind(prevLine, prevPrevLineIndex, commentIndex)
-        # Find next \n char after previous line beginning
-        newlineCharAfterPrevLineIndex = hjsonString.find('\n', prevLineIndex)
-        nextLineIndex = hjsonString.find(nextLine, prevNextLineIndex)
-        hjsonString = hjsonString[:newlineCharAfterPrevLineIndex + 1] + comment + '\n' + hjsonString[nextLineIndex:]
-        prevPrevLineIndex = prevLineIndex
-        prevNextLineIndex = nextLineIndex
-    return hjsonString
+def dumpWithComments(obj, fp, skipkeys=False, ensure_ascii=True, check_circular=True, cls=None, indent=None,
+                     encoding='utf-8', default=None, use_decimal=True, namedtuple_as_object=True, tuple_as_array=True,
+                     bigint_as_string=False, sort_keys=False, item_sort_key=None, for_json=False,
+                     int_as_string_bitcount=None, **kw):
+
+    hjsonString = dumpsWithComments(obj, skipkeys=skipkeys, ensure_ascii=ensure_ascii, check_circular=check_circular,
+                                    cls=cls, encoding=encoding, default=default, use_decimal=use_decimal,
+                                    namedtuple_as_object=namedtuple_as_object, tuple_as_array=tuple_as_array,
+                                    bigint_as_string=bigint_as_string, sort_keys=sort_keys, item_sort_key=item_sort_key,
+                                    for_json=for_json, int_as_string_bitcount=int_as_string_bitcount, **kw)
+    fp.write(hjsonString)
 
 
-def dumpsJSONWithComments(dictObj: Dict[str, Any], commentPositions: List[Tuple[str, str, str, int]], **kwargs) -> str:
-    hjsonString = hjson.dumpsJSON(dictObj, kwargs, indent='    ')
+def dumpsWithComments(obj, commentPositions, skipkeys=False, ensure_ascii=True, check_circular=True,
+                      cls=None, encoding='utf-8', default=None, use_decimal=True, namedtuple_as_object=True,
+                      tuple_as_array=True, bigint_as_string=False, sort_keys=False, item_sort_key=None,
+                      for_json=False, int_as_string_bitcount=None, **kw):
+
+    hjsonString = dumps(obj, skipkeys=skipkeys, ensure_ascii=ensure_ascii, check_circular=check_circular,
+                        cls=cls, encoding=encoding, default=default, use_decimal=use_decimal,
+                        namedtuple_as_object=namedtuple_as_object, tuple_as_array=tuple_as_array,
+                        bigint_as_string=bigint_as_string, sort_keys=sort_keys, item_sort_key=item_sort_key,
+                        for_json=for_json, int_as_string_bitcount=int_as_string_bitcount, indent='    ', **kw)
     prevPrevLineIndex = 0
     prevNextLineIndex = 0
     for comments in commentPositions:
