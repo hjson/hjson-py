@@ -72,7 +72,13 @@ def run_setup():
         license="MIT License",
         packages=['hjson', 'hjson.tests'],
         platforms=['any'],
-        scripts=['bin/hjson', 'bin/hjson.cmd',],
-        **kw)
+        entry_points={
+            "console_scripts": [
+                "hjson = hjson.tool:main",
+            ],
+        },
+        **kw
+    )
+
 
 run_setup()
