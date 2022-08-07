@@ -11,7 +11,6 @@ Usage::
 from __future__ import with_statement
 import sys
 import hjson
-import pkg_resources  # part of setuptools
 
 HELP="""Hjson, a user interface for JSON
 
@@ -42,7 +41,7 @@ def main():
         elif arg == '-j': format = 'json'
         elif arg == '-c': format = 'compact'
         elif arg == '-V' or arg == '--version':
-            showerr('Hjson ' + pkg_resources.require("Hjson")[0].version)
+            showerr('Hjson ' + hjson.__version__)
             return
 
         elif arg[0] == '-':
