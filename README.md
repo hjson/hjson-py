@@ -3,13 +3,13 @@
 [![Build Status](https://img.shields.io/travis/hjson/hjson-py.svg?style=flat-square)](http://travis-ci.org/hjson/hjson-py)
 [![PyPI version](https://img.shields.io/pypi/v/hjson.svg?style=flat-square)](https://pypi.python.org/pypi/hjson)
 
-[Hjson](http://hjson.org), a user interface for JSON
+[Hjson](https://hjson.github.io), a user interface for JSON
 
-![Hjson Intro](http://hjson.org/hjson1.gif)
+![Hjson Intro](https://hjson.github.io/hjson1.gif)
 
 Hjson works with Python 2.5+ and Python 3.3+
 
-The Python implementation of Hjson is based on [simplejson](https://github.com/simplejson/simplejson). For other platforms see [hjson.org](http://hjson.org).
+The Python implementation of Hjson is based on [simplejson](https://github.com/simplejson/simplejson). For other platforms see [hjson.github.io](https://hjson.github.io).
 
 # Installation
 

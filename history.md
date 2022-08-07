@@ -1,5 +1,8 @@
 # History
 
+- v3.0.2
+  - Use relative import
+  - Fix empty multiline strings
 - v3.0.1
   - change hjson (cli tool) to use unicode
 - v3.0.0

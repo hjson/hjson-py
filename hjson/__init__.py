@@ -1,7 +1,7 @@
 r"""Hjson, the Human JSON. A configuration file format that caters to
 humans and helps reduce the errors they make.
 
-For details and syntax see <http://hjson.org>.
+For details and syntax see <https://hjson.github.io>.
 
 Decoding Hjson::
 
@@ -36,7 +36,7 @@ Using hjson.tool from the shell to validate and pretty-print::
 
 """
 from __future__ import absolute_import
-__version__ = '3.0.1'
+__version__ = '3.0.2'
 __all__ = [
     'dump', 'dumps', 'load', 'loads',
     'dumpJSON', 'dumpsJSON',
