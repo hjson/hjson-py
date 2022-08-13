@@ -1,5 +1,9 @@
 # History
 
+- v3.1.0
+  - New maintainer @groodt
+  - Use entrypoints instead of scripts
+  - Remove usage of pkg_resources
 - v3.0.2
   - Use relative import
   - Fix empty multiline strings
