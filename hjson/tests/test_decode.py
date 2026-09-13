@@ -24,6 +24,30 @@ class TestDecode(TestCase):
         self.assertTrue(isinstance(rval, float))
         self.assertEqual(rval, 1.0)
 
+    def test_decimal_point_is_not_dropped(self):
+        # A literal that was written with a decimal point should stay a
+        # float even when its fractional part is all zeros, since the
+        # author explicitly chose the float form. Silently turning it
+        # into an int both loses that distinction and breaks round
+        # tripping: dumps(1.0) already produces "1.0", so loads("1.0")
+        # ought to hand back a float rather than an int.
+        for text, expected in (
+            ("1.0", 1.0),
+            ("10.00", 10.0),
+            ("-3.0", -3.0),
+        ):
+            rval = json.loads(text)
+            self.assertTrue(isinstance(rval, float), (text, rval))
+            self.assertEqual(rval, expected)
+
+    def test_exponent_can_still_collapse_to_int(self):
+        # When it's the exponent that turns the value into a whole
+        # number, keeping it an int is fine: the decimal point in the
+        # source wasn't the last word on the value's magnitude.
+        rval = json.loads("17.01e2")
+        self.assertTrue(isinstance(rval, int))
+        self.assertEqual(rval, 1701)
+
     def test_decoder_optimizations(self):
         # Several optimizations were made that skip over calls to
         # the whitespace regex, so this test is designed to try and

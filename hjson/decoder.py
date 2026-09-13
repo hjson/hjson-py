@@ -253,7 +253,12 @@ def scantfnns(context, s, end):
                 integer, frac, exp = m.groups()
                 if frac or exp:
                     res = context.parse_float(integer + (frac or '') + (exp or ''))
-                    if int(res) == res and abs(res)<1e10: res = int(res)
+                    # Only collapse to int when the exponent is what made the
+                    # value a whole number (e.g. "17.01e2" -> 1701). A plain
+                    # decimal literal like "1.0" or "10.00" was written as a
+                    # float on purpose and should stay one, matching what
+                    # dumps() produces for it and what json.loads() would do.
+                    if exp and int(res) == res and abs(res)<1e10: res = int(res)
                 else:
                     res = context.parse_int(integer)
                 return res, end
