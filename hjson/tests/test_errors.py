@@ -34,6 +34,22 @@ class TestErrors(TestCase):
             self.assertEqual(err.lineno, 1)
             self.assertEqual(err.colno, 10)
 
+    def test_unterminated_block_comment(self):
+        for document in ('/*', '/**', '/* comment', '[1, /*', '{a: 1 /*'):
+            for transform in (u, b):
+                try:
+                    json.loads(transform(document))
+                except json.HjsonDecodeError as error:
+                    self.assertEqual(error.msg, 'Unterminated block comment')
+                    self.assertEqual(error.pos, document.index('/*'))
+                else:
+                    self.fail('Expected HjsonDecodeError')
+
+    def test_completed_block_comment(self):
+        for comment in ('/**/', '/***/', '/* comment */', '/* / ** */'):
+            self.assertEqual(json.loads(comment + ' 2'), 2)
+            self.assertEqual(json.loads('[1, ' + comment + ' 2]'), [1, 2])
+
     def test_error_is_pickable(self):
         err = None
         try:

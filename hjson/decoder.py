@@ -51,13 +51,15 @@ def getNext(s, end):
         if ch == '#' or ch == '/' and ch2 == '/':
             end = getEol(s, end)
         elif ch == '/' and ch2 == '*':
+            begin = end
             end += 2
-            ch = s[end]
-            while ch != '' and not (ch == '*' and s[end + 1] == '/'):
+            ch = s[end:end + 1]
+            while ch != '' and not (ch == '*' and s[end + 1:end + 2] == '/'):
                 end += 1
-                ch = s[end]
-            if ch != '':
-                end += 2
+                ch = s[end:end + 1]
+            if ch == '':
+                raise HjsonDecodeError('Unterminated block comment', s, begin)
+            end += 2
         else:
             break
 
