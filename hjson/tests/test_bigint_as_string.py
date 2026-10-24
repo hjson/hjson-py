@@ -65,3 +65,36 @@ class TestBigintAsString(TestCase):
                 self.assertEqual(
                     expect,
                     json.loads(json.dumpsJSON(val, **opts)))
+
+
+class TestHjsonBigInt(TestCase):
+    def test_hjson_integer_string_options(self):
+        for options, bits in (({'bigint_as_string': True}, 53),
+                              ({'int_as_string_bitcount': 8}, 8)):
+            for value in (-(1 << bits) - 1, -(1 << bits),
+                          (1 << bits), (1 << bits) + 1):
+                for wrap in (lambda x: x, lambda x: [x], lambda x: {'value': x}):
+                    encoded = json.dumps(wrap(value), **options)
+                    self.assertEqual(json.loads(encoded), wrap(str(value)))
+
+    def test_hjson_small_integers_and_default_stay_numeric(self):
+        for bits in (8, 53):
+            for value in (-(1 << bits) + 1, -1, 0, 1, (1 << bits) - 1):
+                self.assertEqual(json.loads(json.dumps(
+                    value, int_as_string_bitcount=bits)), value)
+        value = 1 << 60
+        self.assertEqual(json.loads(json.dumps(value)), value)
+
+    def test_bigint_option_takes_precedence_over_bitcount(self):
+        value = 1 << 8
+        self.assertEqual(json.loads(json.dumps(
+            value, bigint_as_string=True, int_as_string_bitcount=8)), value)
+
+    def test_hjson_dump_and_noninteger_values(self):
+        from io import StringIO
+        value = 1 << 53
+        stream = StringIO()
+        json.dump({value: [value, True, False, None, 1.5]}, stream,
+                  bigint_as_string=True)
+        self.assertEqual(json.loads(stream.getvalue()),
+                         {str(value): [str(value), True, False, None, 1.5]})

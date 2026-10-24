@@ -328,7 +328,10 @@ def _make_iterencode(markers, _default, _encoder, _indent, _floatstr,
         raise TypeError("int_as_string_bitcount must be a positive integer")
 
     def _encode_int(value):
-        return str(value)
+        if (_int_as_string_bitcount is None or
+            (-1 << _int_as_string_bitcount) < value < (1 << _int_as_string_bitcount)):
+            return str(value)
+        return '"' + str(value) + '"'
 
     def _stringify_key(key):
         if isinstance(key, string_types): # pragma: no cover
