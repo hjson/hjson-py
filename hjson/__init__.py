@@ -7,8 +7,8 @@ Decoding Hjson::
 
     >>> import hjson
     >>> text = "{\n  foo: a\n  bar: 1\n}"
-    >>> hjson.loads(text)
-    OrderedDict([('foo', 'a'), ('bar', 1)])
+    >>> list(hjson.loads(text).items())
+    [('foo', 'a'), ('bar', 1)]
 
 Encoding Python object hierarchies::
 
