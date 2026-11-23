@@ -17,6 +17,16 @@ class TestFloat(TestCase):
             self.assertEqual(json.loads(json.dumpsJSON(num)), num)
             self.assertEqual(json.loads(text_type(json.dumpsJSON(num))), num)
 
+    def test_out_of_range(self):
+        for doc, expected in [
+                ('[1e400]', [PosInf]),
+                ('[-1e400]', [NegInf]),
+                ('1e400', PosInf),
+                ('{"a": 1e400}', {'a': PosInf}),
+                ('a: 1e400', {'a': PosInf}),
+                ('[2.0]', [2])]:
+            self.assertEqual(json.loads(doc), expected)
+
     def test_ints(self):
         for num in [1, long_type(1), 1<<32, 1<<64]:
             self.assertEqual(json.dumpsJSON(num), str(num))
